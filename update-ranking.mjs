@@ -38,8 +38,13 @@ function getMonth(now) {
   };
 }
 
-function normalizePlayerKey(name) {
-  return name.normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase("en-US");
+function correctPlayerName(name) {
+  const cleaned = name.normalize("NFKC").trim().replace(/\s+/g, " ");
+
+  // The proxy can return the uppercase "I" in KEISUKE as a lowercase "l".
+  if (cleaned === "KElSUKE") return "KEISUKE";
+
+  return cleaned;
 }
 
 function parseRows(rows) {
@@ -51,7 +56,7 @@ function parseRows(rows) {
 
     const rank = Number(values[0].replace(/[^\d]/g, ""));
     const score = Number(values.at(-1).replace(/[^\d]/g, ""));
-    const player = values.slice(1, -1).join(" ").trim();
+    const player = correctPlayerName(values.slice(1, -1).join(" "));
 
     if (
       Number.isInteger(rank) &&
@@ -68,15 +73,6 @@ function parseRows(rows) {
 
   return players
     .sort((a, b) => a.rank - b.rank || b.score - a.score)
-    .filter(
-      (entry, index, all) =>
-        index ===
-        all.findIndex(
-          (candidate) =>
-            normalizePlayerKey(candidate.player) === normalizePlayerKey(entry.player) &&
-            candidate.score === entry.score,
-        ),
-    )
     .slice(0, 10);
 }
 
