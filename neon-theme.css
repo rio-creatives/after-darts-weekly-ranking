@@ -123,6 +123,7 @@ body {
   overflow: visible;
   background: transparent;
   mix-blend-mode: normal;
+  transform: translateX(-20px);
 }
 
 .brand-logo {
