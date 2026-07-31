@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090b16" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>AFTER Weekly COUNT-UP Ranking</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="screen">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
+
+      <header class="topbar">
+        <div class="brand" aria-label="AFTER">
+          <span class="brand-mark">A</span>
+          <span class="brand-name">AFTER</span>
+        </div>
+
+        <div class="live-status">
+          <span class="live-dot"></span>
+          <span>LIVE UPDATE</span>
+        </div>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">AFTER BAR MAKATI</p>
+        <h1>WEEKLY <span>COUNT-UP</span> RANKING</h1>
+        <p id="weekRange" class="week-range">Loading week…</p>
+      </section>
+
+      <section id="rankingContent" class="ranking-content" aria-live="polite">
+        <div id="podium" class="podium"></div>
+        <ol id="rankingList" class="ranking-list"></ol>
+      </section>
+
+      <section id="emptyState" class="empty-state" hidden>
+        <p>Weekly ranking data is being prepared.</p>
+      </section>
+
+      <footer class="footer">
+        <p>PLAYER'S BEST SCORE OF THE WEEK</p>
+        <p>UPDATED <time id="updatedAt">—</time> PHT</p>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
