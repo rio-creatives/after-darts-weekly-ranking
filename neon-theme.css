@@ -299,6 +299,23 @@ h1 span {
   letter-spacing: 0.14em;
 }
 
+.podium-rank::before {
+  flex: 0 0 auto;
+  width: clamp(22px, 1.8vw, 31px);
+  height: clamp(17px, 1.4vw, 24px);
+  margin-right: 2px;
+  background: currentColor;
+  content: "";
+  filter: drop-shadow(0 0 8px currentColor);
+  -webkit-mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M3 6.5 9.2 12 16 3.2 22.8 12 29 6.5 26.2 20.5H5.8L3 6.5Zm3.2 12h19.6v3H6.2v-3Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M3 6.5 9.2 12 16 3.2 22.8 12 29 6.5 26.2 20.5H5.8L3 6.5Zm3.2 12h19.6v3H6.2v-3Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: translateY(-1px);
+}
+
 .podium-rank strong {
   font-size: clamp(21px, 2vw, 34px);
   letter-spacing: -0.05em;
