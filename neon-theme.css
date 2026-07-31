@@ -121,7 +121,8 @@ body {
   width: clamp(245px, 19vw, 340px);
   height: clamp(112px, 8.7vw, 154px);
   overflow: visible;
-  mix-blend-mode: screen;
+  background: transparent;
+  mix-blend-mode: normal;
 }
 
 .brand-logo {
@@ -133,12 +134,8 @@ body {
   max-height: 100%;
   object-fit: contain;
   object-position: center;
-  filter:
-    brightness(1.12)
-    contrast(1.14)
-    saturate(1.12)
-    drop-shadow(0 0 14px rgba(255, 83, 246, 0.36));
-  mix-blend-mode: screen;
+  filter: none;
+  mix-blend-mode: screen !important;
   transform: none;
 }
 
