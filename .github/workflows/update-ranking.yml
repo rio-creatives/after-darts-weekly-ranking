@@ -1,4 +1,4 @@
-name: Update weekly ranking
+name: Update monthly ranking
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-weekly-ranking
+  group: update-monthly-ranking
   cancel-in-progress: false
 
 jobs:
@@ -42,6 +42,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No ranking changes to commit."
           else
-            git commit -m "Update weekly ranking [skip ci]"
+            git commit -m "Update monthly ranking [skip ci]"
             git push
           fi
