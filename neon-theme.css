@@ -102,8 +102,7 @@ body {
 
 .topbar {
   position: relative;
-  height: clamp(170px, 12vw, 220px);
-  min-height: 0;
+  min-height: clamp(112px, 10vw, 165px);
   padding-bottom: clamp(10px, 1.3vw, 22px);
   border-bottom: 1px solid rgba(255, 99, 246, 0.15);
 }
@@ -111,14 +110,13 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  height: 100%;
-  min-height: 0;
+  min-height: 96px;
 }
 
 .brand-logo-frame {
   position: relative;
   width: clamp(245px, 19vw, 340px);
-  height: clamp(120px, 9vw, 165px);
+  height: clamp(112px, 8.7vw, 154px);
   overflow: hidden;
   mix-blend-mode: screen;
 }
@@ -136,7 +134,7 @@ body {
     saturate(1.12)
     drop-shadow(0 0 14px rgba(255, 83, 246, 0.36));
   mix-blend-mode: screen;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -47%);
 }
 
 .dartslive-logo-frame {
