@@ -3,13 +3,10 @@
  * The existing layout, card dimensions, typography and ranking logic are unchanged.
  */
 
+/* 全画像に共通する設定 */
 .podium-card::before {
   position: absolute;
   z-index: 1;
-  top: 50%;
-  right: -4px;
-  /* Silver,Blonz size*/
-  width: clamp(138px, 12.5vw, 194px);
   aspect-ratio: 1;
   background-position: center;
   background-repeat: no-repeat;
@@ -18,36 +15,77 @@
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.42));
   opacity: 0.92;
   pointer-events: none;
-  transform: translateY(-50%);
 }
 
+/* テキストを画像より前面に表示 */
 .podium-card > * {
   position: relative;
   z-index: 2;
 }
 
+/* 1位：ゴールド */
 .podium-card.first::before {
-    /* Gold size*/
   width: clamp(160px, 15vw, 225px);
+
+  /* 左右位置：大きくすると左へ、マイナスにすると右へ */
   right: 16px;
+
+  /* 上下位置：小さくすると上へ、大きくすると下へ */
+  top: 50%;
+
+  transform: translateY(-50%);
   background-image: url("podium-gold.png");
 }
 
+/* 2位：シルバー */
 .podium-card.second::before {
+  width: clamp(138px, 12.5vw, 194px);
+
+  /* シルバーの左右位置 */
+  right: -4px;
+
+  /* シルバーの上下位置 */
+  top: 50%;
+
+  transform: translateY(-50%);
   background-image: url("podium-silver.png");
 }
 
+/* 3位：ブロンズ */
 .podium-card.third::before {
+  width: clamp(142px, 13.5vw, 198px);
+
+  /* ブロンズの左右位置 */
+  right: -4px;
+
+  /* ブロンズの上下位置 */
+  top: 50%;
+
+  transform: translateY(-50%);
   background-image: url("podium-bronze.png");
 }
 
+/* 画面幅720px以下 */
 @media (max-width: 720px) {
-  .podium-card::before {
-    right: -8px;
-    width: clamp(116px, 34vw, 154px);
-  }
 
+  /* 1位：ゴールド */
   .podium-card.first::before {
     width: clamp(132px, 38vw, 176px);
+    right: -8px;
+    top: 50%;
+  }
+
+  /* 2位：シルバー */
+  .podium-card.second::before {
+    width: clamp(116px, 34vw, 154px);
+    right: -8px;
+    top: 50%;
+  }
+
+  /* 3位：ブロンズ */
+  .podium-card.third::before {
+    width: clamp(116px, 34vw, 154px);
+    right: -8px;
+    top: 50%;
   }
 }
