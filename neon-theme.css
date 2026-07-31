@@ -270,21 +270,23 @@ h1 span {
 
 .podium-card.first {
   min-height: clamp(150px, 18vh, 230px);
-  border-color: rgba(255, 99, 246, 0.62);
-  color: var(--pink-bright);
+  border-color: rgba(255, 208, 90, 0.58);
+  color: #ffd05a;
   box-shadow:
     0 24px 80px rgba(0, 0, 0, 0.38),
-    0 0 30px rgba(255, 99, 246, 0.1),
+    0 0 30px rgba(255, 208, 90, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.055);
   transform: translateY(-10px);
 }
 
 .podium-card.second {
-  color: var(--silver);
+  border-color: rgba(203, 211, 231, 0.2);
+  color: #cbd3e7;
 }
 
 .podium-card.third {
-  color: var(--bronze);
+  border-color: rgba(229, 150, 89, 0.24);
+  color: #e59659;
 }
 
 .podium-rank {
