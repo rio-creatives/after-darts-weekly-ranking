@@ -101,6 +101,7 @@ body {
 }
 
 .topbar {
+  position: relative;
   min-height: clamp(112px, 10vw, 165px);
   padding-bottom: clamp(10px, 1.3vw, 22px);
   border-bottom: 1px solid rgba(255, 99, 246, 0.15);
@@ -134,6 +135,27 @@ body {
     drop-shadow(0 0 14px rgba(255, 83, 246, 0.36));
   mix-blend-mode: screen;
   transform: translate(-50%, -47%);
+}
+
+.dartslive-logo-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(230px, 18vw, 340px);
+  overflow: hidden;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.dartslive-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter:
+    invert(1)
+    contrast(1.2)
+    brightness(1.15);
+  mix-blend-mode: screen;
 }
 
 .live-status {
