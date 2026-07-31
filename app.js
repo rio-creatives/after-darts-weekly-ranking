@@ -91,10 +91,12 @@ function render(data) {
   podium.replaceChildren();
   rankingList.replaceChildren();
 
-  const weekStart = new Date(data.weekStart);
-  const weekEnd = new Date(data.weekEnd);
+  const periodStart = new Date(data.periodStart || data.weekStart);
+  const periodEnd = new Date(data.periodEnd || data.weekEnd);
   document.querySelector("#weekRange").textContent =
-    `${dateFormatter.format(weekStart)} — ${dateFormatter.format(weekEnd)}`;
+    `${dateFormatter.format(periodStart)} — ${dateFormatter.format(periodEnd)}`;
+  document.querySelector(".footer p:first-child").textContent =
+    "PLAYER'S BEST SCORE OF THE MONTH";
 
   document.querySelector("#updatedAt").textContent = updateFormatter
     .format(new Date(data.updatedAt))

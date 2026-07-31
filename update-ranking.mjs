@@ -10,8 +10,7 @@ const TRANSLATED_SHOP_URL =
 const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
 const PHT_OFFSET_MS = 8 * 60 * 60 * 1000;
-const WEEK_START_HOUR = 6;
-const MAX_HISTORY_WEEKS = 12;
+const MAX_HISTORY_MONTHS = 12;
 
 function pad(number) {
   return String(number).padStart(2, "0");
@@ -25,25 +24,15 @@ function toPhtIso(date) {
   );
 }
 
-function getWeek(now) {
+function getMonth(now) {
   const phtClock = new Date(now.getTime() + PHT_OFFSET_MS);
-  const shifted = new Date(phtClock.getTime() - WEEK_START_HOUR * 60 * 60 * 1000);
-  const daysSinceMonday = (shifted.getUTCDay() + 6) % 7;
-
-  const startOnPhtClock = Date.UTC(
-    shifted.getUTCFullYear(),
-    shifted.getUTCMonth(),
-    shifted.getUTCDate() - daysSinceMonday,
-    WEEK_START_HOUR,
-    0,
-    0,
-  );
-
-  const start = new Date(startOnPhtClock - PHT_OFFSET_MS);
-  const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000 - 1000);
+  const year = phtClock.getUTCFullYear();
+  const month = phtClock.getUTCMonth();
+  const start = new Date(Date.UTC(year, month, 1) - PHT_OFFSET_MS);
+  const end = new Date(Date.UTC(year, month + 1, 1) - PHT_OFFSET_MS - 1000);
 
   return {
-    key: toPhtIso(start).slice(0, 10),
+    key: `${year}-${pad(month + 1)}`,
     start,
     end,
   };
@@ -78,15 +67,20 @@ function parseRows(rows) {
   }
 
   return players
-    .sort((a, b) => a.rank - b.rank)
+    .sort((a, b) => a.rank - b.rank || b.score - a.score)
     .filter(
-      (player, index, all) =>
-        index === all.findIndex((candidate) => candidate.rank === player.rank),
+      (entry, index, all) =>
+        index ===
+        all.findIndex(
+          (candidate) =>
+            normalizePlayerKey(candidate.player) === normalizePlayerKey(entry.player) &&
+            candidate.score === entry.score,
+        ),
     )
     .slice(0, 10);
 }
 
-async function scrapeTodayRankingWithBrowser(url = SHOP_URL) {
+async function scrapeMonthlyRankingWithBrowser(url = SHOP_URL) {
   const browser = await chromium.launch({
     headless: true,
     args: ["--disable-dev-shm-usage", "--no-sandbox"],
@@ -118,8 +112,6 @@ async function scrapeTodayRankingWithBrowser(url = SHOP_URL) {
     const section = await page.evaluate(() => {
       const normalize = (value) => value.replace(/\s+/g, " ").trim();
       const allElements = [...document.querySelectorAll("body *")];
-      const todayPattern = /COUNT-UP RANKING\s*\(Today\)/i;
-      const monthlyPattern = /Monthly Shop Ranking/i;
 
       const findShortestMatch = (pattern, afterElement = null) =>
         allElements
@@ -138,21 +130,25 @@ async function scrapeTodayRankingWithBrowser(url = SHOP_URL) {
               normalize(a.textContent || "").length - normalize(b.textContent || "").length,
           )[0];
 
-      const heading = findShortestMatch(todayPattern);
-      if (!heading) return { found: false, text: "", rows: [] };
+      const monthlyHeading = findShortestMatch(/Monthly Shop Ranking/i);
+      if (!monthlyHeading) return { found: false, text: "", rows: [] };
 
-      const monthlyHeading = findShortestMatch(monthlyPattern, heading);
+      const thisMonthHeading = findShortestMatch(/^This Month$/i, monthlyHeading);
+      if (!thisMonthHeading) return { found: false, text: "", rows: [] };
+
+      const lastMonthHeading = findShortestMatch(/^Last Month$/i, thisMonthHeading);
       const isBetween = (element) => {
-        const afterHeading = Boolean(
-          heading.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING,
+        const afterStart = Boolean(
+          thisMonthHeading.compareDocumentPosition(element) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
         );
-        const beforeMonthly =
-          !monthlyHeading ||
+        const beforeEnd =
+          !lastMonthHeading ||
           Boolean(
-            element.compareDocumentPosition(monthlyHeading) &
+            element.compareDocumentPosition(lastMonthHeading) &
               Node.DOCUMENT_POSITION_FOLLOWING,
           );
-        return afterHeading && beforeMonthly;
+        return afterStart && beforeEnd;
       };
 
       const tables = [...document.querySelectorAll("table, [role='table']")].filter(isBetween);
@@ -168,28 +164,28 @@ async function scrapeTodayRankingWithBrowser(url = SHOP_URL) {
       );
 
       let sectionText = "";
-      if (monthlyHeading) {
+      if (lastMonthHeading) {
         const range = document.createRange();
-        range.setStartAfter(heading);
-        range.setEndBefore(monthlyHeading);
+        range.setStartAfter(thisMonthHeading);
+        range.setEndBefore(lastMonthHeading);
         sectionText = normalize(range.cloneContents().textContent || "");
       } else {
-        sectionText = normalize(heading.parentElement?.textContent || "");
+        sectionText = normalize(thisMonthHeading.parentElement?.textContent || "");
       }
 
       return { found: true, text: sectionText, rows };
     });
 
     if (!section.found) {
-      throw new Error("Could not find the COUNT-UP RANKING (Today) section.");
+      throw new Error("Could not find the monthly COUNT-UP ranking section.");
     }
 
     const players = parseRows(section.rows);
     if (!players.length && !/No Play Data/i.test(section.text)) {
-      throw new Error("The daily ranking section was found, but its rows could not be parsed.");
+      throw new Error("The monthly ranking section was found, but its rows could not be parsed.");
     }
 
-    console.log(`Found ${players.length} daily COUNT-UP ranking entries.`);
+    console.log(`Found ${players.length} monthly COUNT-UP ranking entries.`);
     return players;
   } finally {
     await browser.close();
@@ -197,16 +193,24 @@ async function scrapeTodayRankingWithBrowser(url = SHOP_URL) {
 }
 
 function parseReaderText(text) {
-  const startMatch = text.match(/COUNT-UP RANKING\s*\(Today\)/i);
-  if (!startMatch || startMatch.index === undefined) {
-    throw new Error("Reader response did not contain the daily COUNT-UP heading.");
+  const monthlyMatch = text.match(/Monthly Shop Ranking/i);
+  if (!monthlyMatch || monthlyMatch.index === undefined) {
+    throw new Error("Reader response did not contain the monthly ranking heading.");
   }
 
-  const afterHeading = text.slice(startMatch.index + startMatch[0].length);
-  const endMatch = afterHeading.match(/Monthly Shop Ranking/i);
-  const sectionText = endMatch
-    ? afterHeading.slice(0, endMatch.index)
-    : afterHeading.slice(0, 5_000);
+  const afterMonthlyHeading = text.slice(monthlyMatch.index + monthlyMatch[0].length);
+  const thisMonthMatch = afterMonthlyHeading.match(/This Month/i);
+  if (!thisMonthMatch || thisMonthMatch.index === undefined) {
+    throw new Error("Reader response did not contain the current-month heading.");
+  }
+
+  const afterThisMonth = afterMonthlyHeading.slice(
+    thisMonthMatch.index + thisMonthMatch[0].length,
+  );
+  const lastMonthMatch = afterThisMonth.match(/Last Month/i);
+  const sectionText = lastMonthMatch
+    ? afterThisMonth.slice(0, lastMonthMatch.index)
+    : afterThisMonth.slice(0, 5_000);
 
   const rows = sectionText
     .split(/\r?\n/)
@@ -222,13 +226,13 @@ function parseReaderText(text) {
 
   const players = parseRows(rows);
   if (!players.length && !/No Play Data/i.test(sectionText)) {
-    throw new Error("Reader found the daily section, but its rows could not be parsed.");
+    throw new Error("Reader found the monthly section, but its rows could not be parsed.");
   }
 
   return players;
 }
 
-async function scrapeTodayRankingWithReader() {
+async function scrapeMonthlyRankingWithReader() {
   const readerUrl =
     "https://r.jina.ai/http://search.dartslive.com/ph/shop/" +
     "5c142ac9a5d39ea9fec1ae84bb28bd87/data";
@@ -246,106 +250,71 @@ async function scrapeTodayRankingWithReader() {
   }
 
   const players = parseReaderText(await response.text());
-  console.log(`Reader fallback found ${players.length} daily ranking entries.`);
+  console.log(`Reader fallback found ${players.length} monthly ranking entries.`);
   return players;
 }
 
-async function scrapeTodayRanking() {
+async function scrapeMonthlyRanking() {
   try {
-    return await scrapeTodayRankingWithBrowser();
+    return await scrapeMonthlyRankingWithBrowser();
   } catch (browserError) {
     console.warn(`Direct DARTSLIVE access failed: ${browserError.message}`);
   }
 
   try {
     console.log("Trying the translated-page fallback.");
-    return await scrapeTodayRankingWithBrowser(TRANSLATED_SHOP_URL);
+    return await scrapeMonthlyRankingWithBrowser(TRANSLATED_SHOP_URL);
   } catch (translatedPageError) {
     console.warn(`Translated-page fallback failed: ${translatedPageError.message}`);
   }
 
   console.log("Trying the reader fallback.");
-  return scrapeTodayRankingWithReader();
+  return scrapeMonthlyRankingWithReader();
 }
 
 async function readHistory() {
   try {
     return JSON.parse(await readFile(HISTORY_FILE, "utf8"));
   } catch (error) {
-    if (error.code === "ENOENT") return { weeks: {} };
+    if (error.code === "ENOENT") return { months: {} };
     throw error;
   }
-}
-
-function makeCurrentRanking(weekRecord, updatedAt) {
-  const rankings = Object.values(weekRecord.players)
-    .sort(
-      (a, b) =>
-        b.score - a.score ||
-        a.bestRecordedAt.localeCompare(b.bestRecordedAt) ||
-        a.player.localeCompare(b.player, "en"),
-    )
-    .slice(0, 10)
-    .map((player, index) => ({
-      rank: index + 1,
-      player: player.player,
-      score: player.score,
-    }));
-
-  return {
-    weekStart: weekRecord.weekStart,
-    weekEnd: weekRecord.weekEnd,
-    updatedAt,
-    rankings,
-  };
 }
 
 async function main() {
   const now = new Date();
   const updatedAt = toPhtIso(now);
-  const week = getWeek(now);
-  const dailyPlayers = await scrapeTodayRanking();
+  const month = getMonth(now);
+  const rankings = await scrapeMonthlyRanking();
   const history = await readHistory();
 
-  history.weeks ??= {};
-  history.weeks[week.key] ??= {
-    weekStart: toPhtIso(week.start),
-    weekEnd: toPhtIso(week.end),
-    players: {},
+  history.months ??= {};
+  history.months[month.key] = {
+    periodStart: toPhtIso(month.start),
+    periodEnd: toPhtIso(month.end),
+    updatedAt,
+    rankings,
   };
 
-  const currentWeek = history.weeks[week.key];
-
-  for (const entry of dailyPlayers) {
-    const key = normalizePlayerKey(entry.player);
-    const existing = currentWeek.players[key];
-
-    if (!existing || entry.score > existing.score) {
-      currentWeek.players[key] = {
-        player: entry.player,
-        score: entry.score,
-        bestRecordedAt: updatedAt,
-        lastSeenAt: updatedAt,
-      };
-    } else {
-      existing.lastSeenAt = updatedAt;
-    }
-  }
-
-  const retainedKeys = Object.keys(history.weeks).sort().slice(-MAX_HISTORY_WEEKS);
-  history.weeks = Object.fromEntries(
-    retainedKeys.map((key) => [key, history.weeks[key]]),
+  const retainedKeys = Object.keys(history.months).sort().slice(-MAX_HISTORY_MONTHS);
+  history.months = Object.fromEntries(
+    retainedKeys.map((key) => [key, history.months[key]]),
   );
   history.lastSuccessfulCheckAt = updatedAt;
   history.source = SHOP_URL;
 
-  const ranking = makeCurrentRanking(currentWeek, updatedAt);
+  const ranking = {
+    periodType: "monthly",
+    periodStart: toPhtIso(month.start),
+    periodEnd: toPhtIso(month.end),
+    updatedAt,
+    rankings,
+  };
+
   await writeFile(HISTORY_FILE, `${JSON.stringify(history, null, 2)}\n`);
   await writeFile(RANKING_FILE, `${JSON.stringify(ranking, null, 2)}\n`);
 
-  console.log(
-    `Saved ${ranking.rankings.length} weekly entries for week ${week.key}.`,
-  );
+  console.log(`Saved ${rankings.length} monthly entries for ${month.key}.`);
 }
 
 main().catch((error) => {
