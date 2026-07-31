@@ -102,6 +102,9 @@ body {
 
 .topbar {
   position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   min-height: clamp(112px, 10vw, 165px);
   padding-bottom: clamp(10px, 1.3vw, 22px);
   border-bottom: 1px solid rgba(255, 99, 246, 0.15);
@@ -111,6 +114,8 @@ body {
   display: flex;
   align-items: center;
   min-height: 96px;
+  justify-self: start;
+  align-self: center;
 }
 
 .brand-logo-frame {
@@ -141,14 +146,15 @@ body {
 }
 
 .dartslive-logo-frame {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: static;
+  justify-self: center;
+  align-self: center;
   width: clamp(230px, 18vw, 340px);
   overflow: hidden;
   pointer-events: none;
-  transform: translate(-50%, -50%);
+  transform: none;
 }
+
 
 .dartslive-logo {
   display: block;
@@ -159,8 +165,10 @@ body {
 }
 
 .live-status {
-  display: flex;
+    display: flex;
   align-items: center;
+  justify-self: end;
+  align-self: center;
   gap: 10px;
   color: #d9cddd;
   font-size: clamp(14px, 0.85vw, 15px);
@@ -463,10 +471,8 @@ h1 span {
 }
 
 .dartslive-logo-frame {
-  top: auto;
-  bottom: 10px;
   width: 170px;
-  transform: translateX(-50%);
+  transform: none;
 }
 
 .brand-logo-frame {
