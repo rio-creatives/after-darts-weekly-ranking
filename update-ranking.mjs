@@ -3,6 +3,10 @@ import { chromium } from "playwright";
 
 const SHOP_URL =
   "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data";
+const TRANSLATED_SHOP_URL =
+  "https://search-dartslive-com.translate.goog/ph/shop/" +
+  "5c142ac9a5d39ea9fec1ae84bb28bd87/data" +
+  "?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-US";
 const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
 const PHT_OFFSET_MS = 8 * 60 * 60 * 1000;
@@ -82,7 +86,7 @@ function parseRows(rows) {
     .slice(0, 10);
 }
 
-async function scrapeTodayRankingWithBrowser() {
+async function scrapeTodayRankingWithBrowser(url = SHOP_URL) {
   const browser = await chromium.launch({
     headless: true,
     args: ["--disable-dev-shm-usage", "--no-sandbox"],
@@ -97,13 +101,15 @@ async function scrapeTodayRankingWithBrowser() {
         "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
     });
     const page = await context.newPage();
-    const response = await page.goto(SHOP_URL, {
+    const response = await page.goto(url, {
       waitUntil: "domcontentloaded",
       timeout: 60_000,
     });
 
     if (!response || response.status() >= 400) {
-      throw new Error(`DARTSLIVE returned HTTP ${response?.status() ?? "unknown"}.`);
+      throw new Error(
+        `${new URL(url).hostname} returned HTTP ${response?.status() ?? "unknown"}.`,
+      );
     }
 
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
@@ -249,9 +255,17 @@ async function scrapeTodayRanking() {
     return await scrapeTodayRankingWithBrowser();
   } catch (browserError) {
     console.warn(`Direct DARTSLIVE access failed: ${browserError.message}`);
-    console.log("Trying the reader fallback.");
-    return scrapeTodayRankingWithReader();
   }
+
+  try {
+    console.log("Trying the translated-page fallback.");
+    return await scrapeTodayRankingWithBrowser(TRANSLATED_SHOP_URL);
+  } catch (translatedPageError) {
+    console.warn(`Translated-page fallback failed: ${translatedPageError.message}`);
+  }
+
+  console.log("Trying the reader fallback.");
+  return scrapeTodayRankingWithReader();
 }
 
 async function readHistory() {
