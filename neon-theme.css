@@ -151,11 +151,6 @@ body {
   display: block;
   width: 100%;
   height: auto;
-  filter:
-    invert(1)
-    contrast(1.2)
-    brightness(1.15);
-  mix-blend-mode: screen;
 }
 
 .live-status {
