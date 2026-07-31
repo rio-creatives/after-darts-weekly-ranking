@@ -439,6 +439,17 @@ h1 span {
     min-height: 76px;
   }
 
+  .topbar {
+  padding-bottom: 72px;
+}
+
+.dartslive-logo-frame {
+  top: auto;
+  bottom: 10px;
+  width: 170px;
+  transform: translateX(-50%);
+}
+
 .brand-logo-frame {
   width: 190px;
   height: 110px;
