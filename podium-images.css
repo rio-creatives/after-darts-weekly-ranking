@@ -29,6 +29,7 @@
 .podium-card.first::before {
     /* Gold size*/
   width: clamp(160px, 15vw, 225px);
+  right: 16px;
   background-image: url("podium-gold.png");
 }
 
