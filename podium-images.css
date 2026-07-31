@@ -7,7 +7,7 @@
   position: absolute;
   z-index: 1;
   top: 50%;
-  right: clamp(-12px, -0.55vw, -5px);
+  right: -4px;
   /* Silver,Blonz size*/
   width: clamp(138px, 12.5vw, 194px);
   aspect-ratio: 1;
