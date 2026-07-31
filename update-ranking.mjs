@@ -3,6 +3,10 @@ import { chromium } from "playwright";
 
 const SHOP_URL =
   "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data";
+const TRANSLATE_PROXY_URL =
+  "https://search-dartslive-com.translate.goog/ph/shop/" +
+  "5c142ac9a5d39ea9fec1ae84bb28bd87/data" +
+  "?_x_tr_sl=en&_x_tr_tl=fil&_x_tr_hl=en";
 const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
 const PHT_OFFSET_MS = 8 * 60 * 60 * 1000;
@@ -228,6 +232,73 @@ function parseReaderText(text) {
   return players;
 }
 
+function decodeHtmlEntities(value) {
+  const namedEntities = {
+    amp: "&",
+    apos: "'",
+    gt: ">",
+    lt: "<",
+    nbsp: " ",
+    quot: '"',
+  };
+
+  return value
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) =>
+      String.fromCodePoint(Number.parseInt(code, 16)),
+    )
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&([a-z]+);/gi, (entity, name) => namedEntities[name.toLowerCase()] ?? entity);
+}
+
+function stripHtml(value) {
+  return decodeHtmlEntities(value.replace(/<[^>]*>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parseProxyHtml(html) {
+  const tableMatch = html.match(
+    /<tbody[^>]+id=["']count-items-This Month-1["'][^>]*>([\s\S]*?)<\/tbody>/i,
+  );
+  if (!tableMatch) {
+    throw new Error("Proxy response did not contain the current-month COUNT-UP table.");
+  }
+
+  const rows = [...tableMatch[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(
+    (rowMatch) =>
+      [...rowMatch[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(
+        (cellMatch) => stripHtml(cellMatch[1]),
+      ),
+  );
+
+  const players = parseRows(rows);
+  if (!players.length && !/No Play Data/i.test(tableMatch[1])) {
+    throw new Error("Proxy found the monthly table, but its rows could not be parsed.");
+  }
+
+  return players;
+}
+
+async function scrapeMonthlyRankingWithProxy() {
+  const response = await fetch(TRANSLATE_PROXY_URL, {
+    headers: {
+      Accept: "text/html",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    },
+    signal: AbortSignal.timeout(60_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`DARTSLIVE proxy returned HTTP ${response.status}.`);
+  }
+
+  const players = parseProxyHtml(await response.text());
+  console.log(`DARTSLIVE proxy found ${players.length} monthly ranking entries.`);
+  return players;
+}
+
 async function scrapeMonthlyRankingWithReader() {
   const readerUrl =
     "https://r.jina.ai/https://search.dartslive.com/ph/shop/" +
@@ -255,6 +326,13 @@ async function scrapeMonthlyRanking() {
     return await scrapeMonthlyRankingWithBrowser();
   } catch (browserError) {
     console.warn(`Direct DARTSLIVE access failed: ${browserError.message}`);
+  }
+
+  try {
+    console.log("Trying the DARTSLIVE proxy fallback.");
+    return await scrapeMonthlyRankingWithProxy();
+  } catch (proxyError) {
+    console.warn(`DARTSLIVE proxy access failed: ${proxyError.message}`);
   }
 
   console.log("Trying the original-text reader fallback.");
