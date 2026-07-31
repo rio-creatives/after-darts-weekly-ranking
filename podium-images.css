@@ -8,7 +8,7 @@
   z-index: 1;
   top: 50%;
   right: clamp(-12px, -0.55vw, -5px);
-  width: clamp(118px, 10.5vw, 174px);
+  width: clamp(138px, 12.5vw, 194px);
   aspect-ratio: 1;
   background-position: center;
   background-repeat: no-repeat;
@@ -26,7 +26,7 @@
 }
 
 .podium-card.first::before {
-  width: clamp(140px, 12.5vw, 205px);
+  width: clamp(160px, 15vw, 225px);
   background-image: url("podium-gold.png");
 }
 
