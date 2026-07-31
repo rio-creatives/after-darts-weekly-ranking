@@ -114,6 +114,8 @@ body {
 }
 
 .brand-logo-frame {
+  position: relative;
+  left: -20px;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
@@ -122,8 +124,6 @@ body {
   height: clamp(112px, 8.7vw, 154px);
   overflow: visible;
   background: transparent;
-  mix-blend-mode: normal;
-  transform: translateX(-20px);
 }
 
 .brand-logo {
