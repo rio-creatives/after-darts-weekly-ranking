@@ -1,4 +1,4 @@
-const DATA_URL = "data/ranking.json";
+const DATA_URL = "https://raw.githubusercontent.com/rio-creatives/after-darts-weekly-ranking/main/data/ranking.json";
 const AUTO_REFRESH_MS = 5 * 60 * 1000;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
