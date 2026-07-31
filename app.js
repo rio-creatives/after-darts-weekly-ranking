@@ -32,6 +32,12 @@ function podiumClass(rank) {
   return "third";
 }
 
+function podiumGraphic(rank) {
+  if (rank === 1) return "podium-gold.png";
+  if (rank === 2) return "podium-silver.png";
+  return "podium-bronze.png";
+}
+
 function renderPodiumEntry(player) {
   const article = document.createElement("article");
   article.className = `podium-card ${podiumClass(player.rank)}`;
@@ -48,7 +54,13 @@ function renderPodiumEntry(player) {
   score.className = "player-score";
   score.textContent = Number(player.score).toLocaleString("en-US");
 
-  article.append(rank, name, score);
+  const graphic = document.createElement("img");
+  graphic.className = "podium-graphic";
+  graphic.src = podiumGraphic(player.rank);
+  graphic.alt = "";
+  graphic.setAttribute("aria-hidden", "true");
+
+  article.append(rank, name, score, graphic);
   return article;
 }
 
