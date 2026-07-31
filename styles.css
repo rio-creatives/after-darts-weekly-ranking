@@ -99,27 +99,27 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 13px;
+  min-height: 70px;
 }
 
-.brand-mark {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border: 1px solid rgba(46, 232, 255, 0.58);
-  border-radius: 12px;
-  background: linear-gradient(145deg, rgba(46, 232, 255, 0.2), rgba(167, 101, 255, 0.15));
-  box-shadow: 0 0 25px rgba(46, 232, 255, 0.17);
-  color: var(--cyan);
-  font-size: 23px;
-  font-weight: 900;
+.brand-logo-frame {
+  position: relative;
+  width: clamp(155px, 12vw, 210px);
+  height: clamp(72px, 5.5vw, 96px);
+  overflow: hidden;
+  mix-blend-mode: screen;
 }
 
-.brand-name {
-  font-size: clamp(20px, 1.8vw, 32px);
-  font-weight: 900;
-  letter-spacing: 0.18em;
+.brand-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 130%;
+  max-width: none;
+  height: auto;
+  filter: brightness(1.06) contrast(1.08);
+  mix-blend-mode: screen;
+  transform: translate(-50%, -40%);
 }
 
 .live-status {
@@ -350,9 +350,13 @@ h1 span {
     padding: 22px 16px 28px;
   }
 
-  .brand-mark {
-    width: 36px;
-    height: 36px;
+  .brand {
+    min-height: 58px;
+  }
+
+  .brand-logo-frame {
+    width: 140px;
+    height: 66px;
   }
 
   .hero {

@@ -1,4 +1,5 @@
-const DATA_URL = "https://raw.githubusercontent.com/rio-creatives/after-darts-weekly-ranking/main/data/ranking.json";
+const DATA_URL =
+  "https://raw.githubusercontent.com/rio-creatives/after-darts-weekly-ranking/main/data/ranking.json";
 const AUTO_REFRESH_MS = 5 * 60 * 1000;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -90,6 +91,15 @@ function render(data) {
   podium.replaceChildren();
   rankingList.replaceChildren();
 
+  const weekStart = new Date(data.weekStart);
+  const weekEnd = new Date(data.weekEnd);
+  document.querySelector("#weekRange").textContent =
+    `${dateFormatter.format(weekStart)} — ${dateFormatter.format(weekEnd)}`;
+
+  document.querySelector("#updatedAt").textContent = updateFormatter
+    .format(new Date(data.updatedAt))
+    .toUpperCase();
+
   if (!sorted.length) {
     rankingContent.hidden = true;
     emptyState.hidden = false;
@@ -108,15 +118,6 @@ function render(data) {
   sorted
     .filter((player) => player.rank > 3)
     .forEach((player) => rankingList.append(renderListEntry(player)));
-
-  const weekStart = new Date(data.weekStart);
-  const weekEnd = new Date(data.weekEnd);
-  document.querySelector("#weekRange").textContent =
-    `${dateFormatter.format(weekStart)} — ${dateFormatter.format(weekEnd)}`;
-
-  document.querySelector("#updatedAt").textContent = updateFormatter
-    .format(new Date(data.updatedAt))
-    .toUpperCase();
 }
 
 async function loadRanking() {
