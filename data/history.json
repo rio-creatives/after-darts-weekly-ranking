@@ -6,22 +6,22 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-07-31T15:25:47+08:00",
+  "lastSuccessfulCheckAt": "2026-07-31T16:08:32+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
       "periodStart": "2026-07-01T00:00:00+08:00",
       "periodEnd": "2026-07-31T23:59:59+08:00",
-      "updatedAt": "2026-07-31T15:25:47+08:00",
+      "updatedAt": "2026-07-31T16:08:32+08:00",
       "rankings": [
         {
           "rank": 1,
-          "player": "ON THE ROAD",
+          "player": "KElSUKE",
           "score": 631
         },
         {
           "rank": 2,
-          "player": "FUTURE",
+          "player": "MARUFUJI",
           "score": 560
         },
         {
@@ -36,12 +36,12 @@
         },
         {
           "rank": 5,
-          "player": "Enter",
+          "player": "Tomo",
           "score": 482
         },
         {
           "rank": 6,
-          "player": "EARTH",
+          "player": "YUTA",
           "score": 473
         },
         {
@@ -51,7 +51,7 @@
         },
         {
           "rank": 8,
-          "player": "THAT",
+          "player": "RYO",
           "score": 371
         }
       ]

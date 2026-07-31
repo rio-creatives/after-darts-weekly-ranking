@@ -2,40 +2,45 @@
   "periodType": "monthly",
   "periodStart": "2026-07-01T00:00:00+08:00",
   "periodEnd": "2026-07-31T23:59:59+08:00",
-  "updatedAt": "2026-07-31T14:55:00+08:00",
+  "updatedAt": "2026-07-31T16:08:32+08:00",
   "rankings": [
     {
       "rank": 1,
+      "player": "KElSUKE",
+      "score": 631
+    },
+    {
+      "rank": 2,
+      "player": "MARUFUJI",
+      "score": 560
+    },
+    {
+      "rank": 3,
       "player": "KEISUKE",
       "score": 538
     },
     {
-      "rank": 2,
+      "rank": 4,
       "player": "ROSE",
       "score": 513
     },
     {
-      "rank": 3,
-      "player": "KElSUKE",
-      "score": 437
-    },
-    {
-      "rank": 4,
-      "player": "YUTA",
-      "score": 415
-    },
-    {
-      "rank": 4,
-      "player": "MARUFUJI",
-      "score": 415
+      "rank": 5,
+      "player": "Tomo",
+      "score": 482
     },
     {
       "rank": 6,
-      "player": "Queen",
-      "score": 412
+      "player": "YUTA",
+      "score": 473
     },
     {
       "rank": 7,
+      "player": "Queen",
+      "score": 462
+    },
+    {
+      "rank": 8,
       "player": "RYO",
       "score": 371
     }
