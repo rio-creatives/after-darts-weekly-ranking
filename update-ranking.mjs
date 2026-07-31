@@ -82,7 +82,7 @@ function parseRows(rows) {
     .slice(0, 10);
 }
 
-async function scrapeTodayRanking() {
+async function scrapeTodayRankingWithBrowser() {
   const browser = await chromium.launch({
     headless: true,
     args: ["--disable-dev-shm-usage", "--no-sandbox"],
@@ -187,6 +187,70 @@ async function scrapeTodayRanking() {
     return players;
   } finally {
     await browser.close();
+  }
+}
+
+function parseReaderText(text) {
+  const startMatch = text.match(/COUNT-UP RANKING\s*\(Today\)/i);
+  if (!startMatch || startMatch.index === undefined) {
+    throw new Error("Reader response did not contain the daily COUNT-UP heading.");
+  }
+
+  const afterHeading = text.slice(startMatch.index + startMatch[0].length);
+  const endMatch = afterHeading.match(/Monthly Shop Ranking/i);
+  const sectionText = endMatch
+    ? afterHeading.slice(0, endMatch.index)
+    : afterHeading.slice(0, 5_000);
+
+  const rows = sectionText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.includes("|"))
+    .map((line) =>
+      line
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((cell) => cell.trim()),
+    );
+
+  const players = parseRows(rows);
+  if (!players.length && !/No Play Data/i.test(sectionText)) {
+    throw new Error("Reader found the daily section, but its rows could not be parsed.");
+  }
+
+  return players;
+}
+
+async function scrapeTodayRankingWithReader() {
+  const readerUrl =
+    "https://r.jina.ai/http://search.dartslive.com/ph/shop/" +
+    "5c142ac9a5d39ea9fec1ae84bb28bd87/data";
+  const response = await fetch(readerUrl, {
+    headers: {
+      Accept: "text/plain",
+      "X-No-Cache": "true",
+      "X-Return-Format": "markdown",
+    },
+    signal: AbortSignal.timeout(60_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Reader fallback returned HTTP ${response.status}.`);
+  }
+
+  const players = parseReaderText(await response.text());
+  console.log(`Reader fallback found ${players.length} daily ranking entries.`);
+  return players;
+}
+
+async function scrapeTodayRanking() {
+  try {
+    return await scrapeTodayRankingWithBrowser();
+  } catch (browserError) {
+    console.warn(`Direct DARTSLIVE access failed: ${browserError.message}`);
+    console.log("Trying the reader fallback.");
+    return scrapeTodayRankingWithReader();
   }
 }
 
