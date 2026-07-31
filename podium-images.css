@@ -1,0 +1,50 @@
+/*
+ * Podium artwork only.
+ * The existing layout, card dimensions, typography and ranking logic are unchanged.
+ */
+
+.podium-card::before {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: clamp(-12px, -0.55vw, -5px);
+  width: clamp(118px, 10.5vw, 174px);
+  aspect-ratio: 1;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: "";
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.42));
+  opacity: 0.92;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.podium-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.podium-card.first::before {
+  width: clamp(140px, 12.5vw, 205px);
+  background-image: url("podium-gold.png");
+}
+
+.podium-card.second::before {
+  background-image: url("podium-silver.png");
+}
+
+.podium-card.third::before {
+  background-image: url("podium-bronze.png");
+}
+
+@media (max-width: 720px) {
+  .podium-card::before {
+    right: -8px;
+    width: clamp(116px, 34vw, 154px);
+  }
+
+  .podium-card.first::before {
+    width: clamp(132px, 38vw, 176px);
+  }
+}
