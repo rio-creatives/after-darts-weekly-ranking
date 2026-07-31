@@ -2,7 +2,8 @@ name: Update monthly ranking
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    # 毎時7分・22分・37分・52分に起動
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -26,19 +27,71 @@ jobs:
         with:
           node-version: 22
 
+      - name: Check whether ranking update is needed
+        id: update-check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+
+          let shouldRun = false;
+          let reason = "";
+
+          if (process.env.EVENT_NAME === "workflow_dispatch") {
+            shouldRun = true;
+            reason = "Manual execution requested.";
+          } else {
+            try {
+              const ranking = JSON.parse(
+                fs.readFileSync("data/ranking.json", "utf8")
+              );
+
+              const lastUpdated = Date.parse(ranking.updatedAt);
+              const elapsedMilliseconds = Date.now() - lastUpdated;
+              const elapsedMinutes = elapsedMilliseconds / 1000 / 60;
+
+              if (!Number.isFinite(lastUpdated)) {
+                shouldRun = true;
+                reason = "The previous update time is invalid.";
+              } else if (elapsedMinutes >= 55) {
+                shouldRun = true;
+                reason = `Approximately ${Math.floor(elapsedMinutes)} minutes have passed since the last update.`;
+              } else {
+                reason = `Only approximately ${Math.floor(elapsedMinutes)} minutes have passed since the last update.`;
+              }
+            } catch (error) {
+              shouldRun = true;
+              reason = `Could not read the previous ranking data: ${error.message}`;
+            }
+          }
+
+          fs.appendFileSync(
+            process.env.GITHUB_OUTPUT,
+            `should_run=${shouldRun}\n`
+          );
+
+          console.log(reason);
+          console.log(`Run ranking update: ${shouldRun}`);
+          NODE
+
       - name: Install Playwright
+        if: steps.update-check.outputs.should_run == 'true'
         run: |
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
       - name: Collect and aggregate ranking
+        if: steps.update-check.outputs.should_run == 'true'
         run: node update-ranking.mjs
 
       - name: Save ranking data
+        if: steps.update-check.outputs.should_run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/ranking.json data/history.json
+
           if git diff --cached --quiet; then
             echo "No ranking changes to commit."
           else
