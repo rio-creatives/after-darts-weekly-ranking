@@ -3,10 +3,6 @@ import { chromium } from "playwright";
 
 const SHOP_URL =
   "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data";
-const TRANSLATED_SHOP_URL =
-  "https://search-dartslive-com.translate.goog/ph/shop/" +
-  "5c142ac9a5d39ea9fec1ae84bb28bd87/data" +
-  "?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-US";
 const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
 const PHT_OFFSET_MS = 8 * 60 * 60 * 1000;
@@ -234,7 +230,7 @@ function parseReaderText(text) {
 
 async function scrapeMonthlyRankingWithReader() {
   const readerUrl =
-    "https://r.jina.ai/http://search.dartslive.com/ph/shop/" +
+    "https://r.jina.ai/https://search.dartslive.com/ph/shop/" +
     "5c142ac9a5d39ea9fec1ae84bb28bd87/data";
   const response = await fetch(readerUrl, {
     headers: {
@@ -261,14 +257,7 @@ async function scrapeMonthlyRanking() {
     console.warn(`Direct DARTSLIVE access failed: ${browserError.message}`);
   }
 
-  try {
-    console.log("Trying the translated-page fallback.");
-    return await scrapeMonthlyRankingWithBrowser(TRANSLATED_SHOP_URL);
-  } catch (translatedPageError) {
-    console.warn(`Translated-page fallback failed: ${translatedPageError.message}`);
-  }
-
-  console.log("Trying the reader fallback.");
+  console.log("Trying the original-text reader fallback.");
   return scrapeMonthlyRankingWithReader();
 }
 
