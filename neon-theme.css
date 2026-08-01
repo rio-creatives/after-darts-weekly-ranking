@@ -206,7 +206,7 @@ body {
 .eyebrow {
   margin: 0 0 10px;
   color: var(--pink-bright);
-  font-size: clamp(16px, 0.85vw, 14px);
+  font-size: clamp(18px, 1vw, 16px);
   font-weight: 800;
   letter-spacing: 0.4em;
   text-shadow: 0 0 18px rgba(255, 99, 246, 0.65);
