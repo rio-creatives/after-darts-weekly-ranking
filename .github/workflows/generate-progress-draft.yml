@@ -1,0 +1,43 @@
+name: Generate Ranking Progress Draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_date:
+        description: "Progress date in YYYY-MM-DD format"
+        required: true
+        default: "2026-08-08"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Generate ranking progress draft
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TARGET_DATE: ${{ inputs.target_date }}
+        run: node generate-progress-draft.mjs
+
+      - name: Upload generated draft
+        uses: actions/upload-artifact@v4
+        with:
+          name: ranking-progress-draft-${{ inputs.target_date }}
+          path: |
+            generated/progress-draft-${{ inputs.target_date }}.md
+            generated/progress-draft-${{ inputs.target_date }}.json
+          if-no-files-found: error
+          retention-days: 14
