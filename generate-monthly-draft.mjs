@@ -360,6 +360,18 @@ one small bar with fewer than 50 seats.
 Do not say that an activity will be continued unless the
 supplied facts confirm that it is already being performed.
 
+End the public caption with one short sentence encouraging
+players to challenge for the No.1 position in the next month.
+
+The image headline and image text must prioritize the champion,
+No.1 position, and winning score rather than generic wording
+such as "Ranking Results."
+
+The internal nextAction must directly support participation,
+competition, or repeat challenges. Do not recommend duplicating
+information that is already displayed automatically on the
+ranking monitor.
+
 Facebook hashtags must be limited to a maximum of three.
 
 The number supplied is ranking entries, not necessarily
