@@ -344,6 +344,21 @@ async function readHistory() {
   }
 }
 
+function getLatestPreviousRanking(history, currentMonthKey) {
+  const previousMonthKey = Object.keys(history.months ?? {})
+    .filter((key) => key < currentMonthKey)
+    .filter((key) => history.months[key]?.rankings?.length > 0)
+    .sort()
+    .at(-1);
+
+  if (!previousMonthKey) return null;
+
+  return {
+    key: previousMonthKey,
+    ...history.months[previousMonthKey],
+  };
+}
+
 async function main() {
   const now = new Date();
   const updatedAt = toPhtIso(now);
@@ -366,18 +381,30 @@ async function main() {
   history.lastSuccessfulCheckAt = updatedAt;
   history.source = SHOP_URL;
 
+  const previousRanking = getLatestPreviousRanking(history, month.key);
+  const displayedRanking =
+    rankings.length > 0
+      ? history.months[month.key]
+      : previousRanking ?? history.months[month.key];
+
   const ranking = {
     periodType: "monthly",
-    periodStart: toPhtIso(month.start),
-    periodEnd: toPhtIso(month.end),
+    periodStart: displayedRanking.periodStart,
+    periodEnd: displayedRanking.periodEnd,
     updatedAt,
-    rankings,
+    rankings: displayedRanking.rankings,
   };
 
   await writeFile(HISTORY_FILE, `${JSON.stringify(history, null, 2)}\n`);
   await writeFile(RANKING_FILE, `${JSON.stringify(ranking, null, 2)}\n`);
 
-  console.log(`Saved ${rankings.length} monthly entries for ${month.key}.`);
+  if (rankings.length === 0 && previousRanking) {
+    console.log(
+      `No entries found for ${month.key}; continuing to display ${previousRanking.key}.`,
+    );
+  } else {
+    console.log(`Saved ${rankings.length} monthly entries for ${month.key}.`);
+  }
 }
 
 main().catch((error) => {
