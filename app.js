@@ -20,9 +20,9 @@ const updateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 function ordinal(rank) {
-  if (rank === 1) return "1ST";
-  if (rank === 2) return "2ND";
-  if (rank === 3) return "3RD";
+  if (rank === 1) return "ST";
+  if (rank === 2) return "ND";
+  if (rank === 3) return "RD";
   return String(rank);
 }
 
