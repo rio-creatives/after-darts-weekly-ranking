@@ -7,7 +7,7 @@
   isolation: isolate;
   padding-top: clamp(44px, 3vw, 58px);
   padding-bottom: clamp(38px, 3vw, 52px);
-  animation: leader-aura 6s ease-in-out infinite;
+  animation: leader-aura 12s ease-in-out infinite;
 }
 .podium-card.first::before {
   transform-origin: 50% 50%;
