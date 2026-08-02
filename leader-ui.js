@@ -40,7 +40,7 @@
 
     const challenge = document.createElement("span");
     challenge.className = "leader-challenge";
-    challenge.textContent = "DEFEND THE THRONE.";
+    challenge.textContent = "DEFEND THE THRONE!";
 
     const gap = document.createElement("span");
     gap.className = "leader-gap";
