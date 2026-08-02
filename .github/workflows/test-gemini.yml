@@ -1,0 +1,90 @@
+name: Test Gemini API
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Call Gemini API
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GEMINI_API_KEY:-}" ]; then
+            echo "GEMINI_API_KEY is not registered."
+            exit 1
+          fi
+
+          cat > request.json <<'JSON'
+          {
+            "contents": [
+              {
+                "role": "user",
+                "parts": [
+                  {
+                    "text": "Reply with one short English sentence confirming that the Gemini API is working for the AFTER ranking automation."
+                  }
+                ]
+              }
+            ],
+            "generationConfig": {
+              "temperature": 0.2,
+              "maxOutputTokens": 100
+            }
+          }
+          JSON
+
+          status=$(curl \
+            --silent \
+            --show-error \
+            --output response.json \
+            --write-out "%{http_code}" \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --header "x-goog-api-key: ${GEMINI_API_KEY}" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent" \
+            --data @request.json)
+
+          if [ "$status" -ne 200 ]; then
+            echo "Gemini API request failed."
+            echo "HTTP status: $status"
+            cat response.json
+            exit 1
+          fi
+
+          node <<'NODE'
+          const fs = require("fs");
+
+          const response = JSON.parse(
+            fs.readFileSync("response.json", "utf8")
+          );
+
+          const parts =
+            response.candidates?.[0]?.content?.parts ?? [];
+
+          const text = parts
+            .map((part) => part.text ?? "")
+            .join("")
+            .trim();
+
+          if (!text) {
+            console.error(
+              "Gemini returned no text response."
+            );
+            console.error(
+              JSON.stringify(response, null, 2)
+            );
+            process.exit(1);
+          }
+
+          console.log("Gemini API connection successful.");
+          console.log(text);
+          NODE
