@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   generate:
@@ -41,3 +42,70 @@ jobs:
             generated/monthly-draft-${{ inputs.target_month }}.json
           if-no-files-found: error
           retention-days: 14
+
+      - name: Create or update draft issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_MONTH: ${{ inputs.target_month }}
+        run: |
+          set -euo pipefail
+
+          BODY_FILE="generated/monthly-draft-${TARGET_MONTH}.md"
+
+          if [ ! -f "$BODY_FILE" ]; then
+            echo "Generated Markdown file was not found:"
+            echo "$BODY_FILE"
+            exit 1
+          fi
+
+          export TITLE="[Draft] AFTER Monthly Ranking — ${TARGET_MONTH}"
+
+          {
+            echo "<!-- after-monthly-ranking-draft:${TARGET_MONTH} -->"
+            echo "@${GITHUB_REPOSITORY_OWNER}"
+            echo
+            echo "**Review required:** This draft was generated automatically."
+            echo "Please confirm the player names, scores, wording, and prize information before posting."
+            echo
+            cat "$BODY_FILE"
+          } > issue-body.md
+
+          gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state all \
+            --limit 1000 \
+            --json number,title \
+            > existing-issues.json
+
+          ISSUE_NUMBER=$(node <<'NODE'
+          const fs = require("fs");
+
+          const issues = JSON.parse(
+            fs.readFileSync("existing-issues.json", "utf8")
+          );
+
+          const issue = issues.find(
+            (item) => item.title === process.env.TITLE
+          );
+
+          if (issue) {
+            process.stdout.write(String(issue.number));
+          }
+          NODE
+          )
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body-file issue-body.md
+
+            echo "Updated existing Issue #${ISSUE_NUMBER}"
+          else
+            ISSUE_URL=$(gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$TITLE" \
+              --body-file issue-body.md)
+
+            echo "Created Issue:"
+            echo "$ISSUE_URL"
+          fi
