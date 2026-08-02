@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Call Gemini API
+      - name: Diagnose Gemini API
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -23,68 +23,111 @@ jobs:
             exit 1
           fi
 
-          cat > request.json <<'JSON'
-          {
-            "contents": [
-              {
-                "role": "user",
-                "parts": [
-                  {
-                    "text": "Reply with one short English sentence confirming that the Gemini API is working for the AFTER ranking automation."
-                  }
-                ]
-              }
-            ],
-            "generationConfig": {
-              "temperature": 0.2,
-              "maxOutputTokens": 100
-            }
-          }
-          JSON
-
-          status=$(curl \
-            --silent \
-            --show-error \
-            --output response.json \
-            --write-out "%{http_code}" \
-            --request POST \
-            --header "Content-Type: application/json" \
-            --header "x-goog-api-key: ${GEMINI_API_KEY}" \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent" \
-            --data @request.json)
-
-          if [ "$status" -ne 200 ]; then
-            echo "Gemini API request failed."
-            echo "HTTP status: $status"
-            cat response.json
-            exit 1
-          fi
-
           node <<'NODE'
-          const fs = require("fs");
+          const apiKey = process.env.GEMINI_API_KEY;
 
-          const response = JSON.parse(
-            fs.readFileSync("response.json", "utf8")
-          );
+          async function request(url, options = {}) {
+            const response = await fetch(url, {
+              ...options,
+              headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey,
+                ...(options.headers || {}),
+              },
+            });
 
-          const parts =
-            response.candidates?.[0]?.content?.parts ?? [];
+            const body = await response.text();
 
-          const text = parts
-            .map((part) => part.text ?? "")
-            .join("")
-            .trim();
+            if (!response.ok) {
+              console.error(`HTTP status: ${response.status}`);
+              console.error(body);
+              process.exit(1);
+            }
 
-          if (!text) {
-            console.error(
-              "Gemini returned no text response."
-            );
-            console.error(
-              JSON.stringify(response, null, 2)
-            );
-            process.exit(1);
+            return JSON.parse(body);
           }
 
-          console.log("Gemini API connection successful.");
-          console.log(text);
+          async function main() {
+            console.log("Step 1: Checking the API key and listing models...");
+
+            const modelData = await request(
+              "https://generativelanguage.googleapis.com/v1beta/models"
+            );
+
+            const availableModels = (modelData.models || []).filter(
+              (model) =>
+                model.supportedGenerationMethods?.includes(
+                  "generateContent"
+                )
+            );
+
+            if (availableModels.length === 0) {
+              throw new Error(
+                "No models supporting generateContent were found."
+              );
+            }
+
+            console.log("Available text-generation models:");
+
+            for (const model of availableModels.slice(0, 20)) {
+              console.log(`- ${model.name}`);
+            }
+
+            const preferredNames = [
+              "models/gemini-3-flash-preview",
+              "models/gemini-2.5-flash",
+              "models/gemini-2.5-flash-lite",
+            ];
+
+            const selectedModel =
+              preferredNames.find((name) =>
+                availableModels.some((model) => model.name === name)
+              ) ?? availableModels[0].name;
+
+            const modelId = selectedModel.replace(/^models\//, "");
+
+            console.log(`Selected model: ${modelId}`);
+            console.log("Step 2: Testing text generation...");
+
+            const result = await request(
+              `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  contents: [
+                    {
+                      role: "user",
+                      parts: [
+                        {
+                          text: "Reply with one short English sentence confirming that the Gemini API is working for the AFTER ranking automation.",
+                        },
+                      ],
+                    },
+                  ],
+                  generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 100,
+                  },
+                }),
+              }
+            );
+
+            const text = (result.candidates?.[0]?.content?.parts || [])
+              .map((part) => part.text || "")
+              .join("")
+              .trim();
+
+            if (!text) {
+              console.error(JSON.stringify(result, null, 2));
+              throw new Error("Gemini returned no text.");
+            }
+
+            console.log("Gemini API connection successful.");
+            console.log(text);
+          }
+
+          main().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
           NODE
