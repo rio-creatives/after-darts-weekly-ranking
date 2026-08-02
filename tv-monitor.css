@@ -88,7 +88,6 @@
   }
 
   .podium-rank {
-    gap: 0.45vw;
     margin-bottom: 1.15vh;
     font-size: 0.78vw;
   }
@@ -100,6 +99,10 @@
 
   .podium-rank strong {
     font-size: 1.8vw;
+  }
+
+  .rank-suffix {
+    font-size: 0.78vw;
   }
 
   .player-name {
@@ -166,4 +169,3 @@
     width: 10.7vw;
   }
 }
-

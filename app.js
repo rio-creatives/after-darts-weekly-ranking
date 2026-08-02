@@ -23,7 +23,7 @@ function ordinal(rank) {
   if (rank === 1) return "ST";
   if (rank === 2) return "ND";
   if (rank === 3) return "RD";
-  return String(rank);
+  return "";
 }
 
 function podiumClass(rank) {
@@ -38,7 +38,8 @@ function renderPodiumEntry(player) {
 
   const rank = document.createElement("p");
   rank.className = "podium-rank";
-  rank.innerHTML = `<strong>${player.rank}</strong> ${ordinal(player.rank)}`;
+  rank.setAttribute("aria-label", ordinal(player.rank) ? `${player.rank}${ordinal(player.rank)}` : String(player.rank));
+  rank.innerHTML = `<strong class="rank-number">${player.rank}</strong><span class="rank-suffix">${ordinal(player.rank)}</span>`;
 
   const name = document.createElement("p");
   name.className = "player-name";
