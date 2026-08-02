@@ -359,6 +359,10 @@ function getLatestPreviousRanking(history, currentMonthKey) {
   };
 }
 
+function hasRankings(monthRanking) {
+  return Array.isArray(monthRanking?.rankings) && monthRanking.rankings.length > 0;
+}
+
 async function main() {
   const now = new Date();
   const updatedAt = toPhtIso(now);
@@ -367,12 +371,20 @@ async function main() {
   const history = await readHistory();
 
   history.months ??= {};
-  history.months[month.key] = {
+  const savedCurrentRanking = history.months[month.key];
+  const fetchedCurrentRanking = {
     periodStart: toPhtIso(month.start),
     periodEnd: toPhtIso(month.end),
     updatedAt,
     rankings,
   };
+
+  // A temporary zero-result response must not erase rankings already saved for
+  // the current month. Replace the saved month only when fresh entries exist,
+  // or when this month has never been stored before.
+  if (rankings.length > 0 || !savedCurrentRanking) {
+    history.months[month.key] = fetchedCurrentRanking;
+  }
 
   const retainedKeys = Object.keys(history.months).sort().slice(-MAX_HISTORY_MONTHS);
   history.months = Object.fromEntries(
@@ -385,7 +397,9 @@ async function main() {
   const displayedRanking =
     rankings.length > 0
       ? history.months[month.key]
-      : previousRanking ?? history.months[month.key];
+      : hasRankings(savedCurrentRanking)
+        ? savedCurrentRanking
+        : previousRanking ?? history.months[month.key];
 
   const ranking = {
     periodType: "monthly",
@@ -398,7 +412,11 @@ async function main() {
   await writeFile(HISTORY_FILE, `${JSON.stringify(history, null, 2)}\n`);
   await writeFile(RANKING_FILE, `${JSON.stringify(ranking, null, 2)}\n`);
 
-  if (rankings.length === 0 && previousRanking) {
+  if (rankings.length === 0 && hasRankings(savedCurrentRanking)) {
+    console.log(
+      `No entries found for ${month.key}; keeping the latest saved current-month ranking.`,
+    );
+  } else if (rankings.length === 0 && previousRanking) {
     console.log(
       `No entries found for ${month.key}; continuing to display ${previousRanking.key}.`,
     );
