@@ -165,10 +165,6 @@ body {
   mix-blend-mode: normal !important;
 }
 
-.dartslive-logo-frame--mobile {
-  display: none;
-}
-
 .live-status {
     display: flex;
   align-items: center;
@@ -490,16 +486,6 @@ h1 span {
 
   .dartslive-logo-frame--header {
     display: none;
-  }
-
-  .dartslive-logo-frame--mobile {
-    display: block;
-    width: 30vw;
-    margin: 0 auto 12px;
-  }
-
-  .dartslive-logo-frame--mobile .dartslive-logo {
-    width: 100%;
   }
 
   .live-status {
