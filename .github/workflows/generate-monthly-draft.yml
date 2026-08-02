@@ -1,0 +1,43 @@
+name: Generate Monthly Ranking Draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_month:
+        description: "Target month in YYYY-MM format"
+        required: true
+        default: "2026-07"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Generate monthly draft
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TARGET_MONTH: ${{ inputs.target_month }}
+        run: node generate-monthly-draft.mjs
+
+      - name: Upload generated draft
+        uses: actions/upload-artifact@v4
+        with:
+          name: monthly-ranking-draft-${{ inputs.target_month }}
+          path: |
+            generated/monthly-draft-${{ inputs.target_month }}.md
+            generated/monthly-draft-${{ inputs.target_month }}.json
+          if-no-files-found: error
+          retention-days: 14
