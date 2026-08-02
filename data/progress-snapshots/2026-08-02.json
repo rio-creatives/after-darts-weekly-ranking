@@ -1,0 +1,34 @@
+{
+  "snapshotDate": "2026-08-02",
+  "month": "2026-08",
+  "stage": "first_week",
+  "daysRemaining": 29,
+  "dataUpdatedAt": "2026-08-02T20:12:31+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "KEISUKE",
+      "score": 471
+    },
+    {
+      "rank": 2,
+      "player": "YUTA",
+      "score": 451
+    },
+    {
+      "rank": 3,
+      "player": "ROSE",
+      "score": 427
+    },
+    {
+      "rank": 4,
+      "player": "Queen",
+      "score": 422
+    },
+    {
+      "rank": 5,
+      "player": "RYO",
+      "score": 323
+    }
+  ]
+}
