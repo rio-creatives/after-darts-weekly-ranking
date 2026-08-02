@@ -77,29 +77,40 @@ async function selectModel() {
     );
   }
 
-  const preferredModels = [
-    "models/gemini-2.5-flash-lite",
-    "models/gemini-2.5-flash",
-    "models/gemini-3-flash-preview",
-    "models/gemini-3.5-flash",
-    "models/gemini-3.6-flash",
-  ];
+const preferredModels = [
+  "models/gemini-3.5-flash-lite",
+  "models/gemini-3.6-flash",
+  "models/gemini-3.5-flash",
+  "models/gemini-3.1-flash-lite",
+  "models/gemini-3-flash-preview",
+];
 
   const preferredModel = preferredModels.find((name) =>
     availableModels.some((model) => model.name === name)
   );
 
-  const fallbackModel =
-    availableModels.find((model) =>
+const fallbackModel =
+  availableModels.find(
+    (model) =>
+      model.name.startsWith("models/gemini-3") &&
       model.name.includes("flash-lite")
-    ) ||
-    availableModels.find((model) =>
+  ) ||
+  availableModels.find(
+    (model) =>
+      model.name.startsWith("models/gemini-3") &&
       model.name.includes("flash")
-    ) ||
-    availableModels[0];
+  ) ||
+  availableModels.find((model) =>
+    model.name.startsWith("models/gemini-3")
+  );
 
-  return preferredModel || fallbackModel.name;
+if (!preferredModel && !fallbackModel) {
+  throw new Error(
+    "No supported Gemini 3 text-generation model was found."
+  );
 }
+
+return preferredModel || fallbackModel.name;
 
 function extractResponseText(response) {
   return (response.candidates?.[0]?.content?.parts || [])
