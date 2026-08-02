@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#030104" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>AFTER Weekly COUNT-UP Ranking</title>
+    <title>AFTER Monthly COUNT-UP Ranking</title>
 
     <link rel="preload" as="image" href="podium-gold.png" />
     <link rel="preload" as="image" href="podium-silver.png" />
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="neon-theme.css?v=20260731-19" />
     <link rel="stylesheet" href="podium-images.css?v=20260731-2" />
     <link rel="stylesheet" href="tv-monitor.css?v=20260801-1" />
+    <link rel="stylesheet" href="leader-ui.css?v=20260802-1" />
   </head>
   <body>
     <main class="screen">
@@ -47,8 +48,8 @@
 
       <section class="hero">
         <p class="eyebrow">AFTER DARTS LEAGUE</p>
-        <h1>WEEKLY <span>COUNT-UP</span> RANKING</h1>
-        <p id="weekRange" class="week-range">Loading week…</p>
+        <h1>MONTHLY <span>COUNT-UP</span> RANKING</h1>
+        <p id="weekRange" class="week-range">Loading month…</p>
       </section>
 
       <section id="rankingContent" class="ranking-content" aria-live="polite">
@@ -57,15 +58,16 @@
       </section>
 
       <section id="emptyState" class="empty-state" hidden>
-        <p>Weekly ranking data is being prepared.</p>
+        <p>Monthly ranking data is being prepared.</p>
       </section>
 
       <footer class="footer">
-        <p>PLAYER'S BEST SCORE OF THE WEEK</p>
+        <p>PLAYER'S BEST SCORE OF THE MONTH</p>
         <p>UPDATED <time id="updatedAt">—</time> PHT</p>
       </footer>
     </main>
 
     <script src="app.js?v=20260731-4"></script>
+    <script src="leader-ui.js?v=20260802-1"></script>
   </body>
 </html>

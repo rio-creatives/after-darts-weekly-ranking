@@ -1,0 +1,229 @@
+/*
+ * Current-leader presentation layer.
+ * Loaded after the existing theme and TV styles so ranking logic stays untouched.
+ */
+
+.podium-card.first {
+  isolation: isolate;
+  padding-top: clamp(44px, 3vw, 58px);
+  padding-bottom: clamp(38px, 3vw, 52px);
+  animation: leader-aura 12s ease-in-out infinite;
+}
+
+.leader-badge {
+  position: absolute !important;
+  z-index: 5 !important;
+  top: clamp(11px, 0.8vw, 15px);
+  left: 50%;
+  margin: 0;
+  padding: clamp(5px, 0.38vw, 7px) clamp(9px, 0.75vw, 14px);
+  border: 1px solid rgba(255, 220, 126, 0.62);
+  border-radius: 999px;
+  background: rgba(32, 19, 6, 0.84);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 20px rgba(255, 208, 90, 0.16);
+  color: #ffe6a3;
+  font-size: clamp(9px, 0.62vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.17em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.leader-footer {
+  position: absolute !important;
+  z-index: 5 !important;
+  bottom: clamp(11px, 0.85vw, 16px);
+  left: clamp(16px, 1.7vw, 28px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 61%;
+  gap: 10px;
+  font-size: clamp(9px, 0.62vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.leader-challenge {
+  color: #fff1c8;
+  text-shadow: 0 0 14px rgba(255, 214, 104, 0.26);
+}
+
+.leader-gap {
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 213, 106, 0.3);
+  border-radius: 999px;
+  background: rgba(255, 213, 106, 0.09);
+  color: #ffd76e;
+  letter-spacing: 0.09em;
+}
+
+.leader-spotlight,
+.leader-sheen {
+  position: absolute !important;
+  pointer-events: none;
+}
+
+.leader-spotlight {
+  z-index: 0 !important;
+  top: -65%;
+  left: 8%;
+  width: 84%;
+  height: 210%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 223, 133, 0.17) 0%,
+    rgba(255, 208, 90, 0.045) 40%,
+    transparent 70%
+  );
+  animation: leader-spotlight 5.5s ease-in-out infinite;
+}
+
+.leader-sheen {
+  z-index: 4 !important;
+  top: -65%;
+  left: -55%;
+  width: 28%;
+  height: 230%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 248, 211, 0.3),
+    transparent
+  );
+  opacity: 0;
+  transform: rotate(17deg);
+  animation: leader-sheen 12s ease-in-out infinite;
+}
+
+.podium-card.first .podium-rank::before {
+  transform-origin: 50% 85%;
+  animation: leader-crown 3.4s ease-in-out infinite;
+}
+
+@keyframes leader-aura {
+  0%,
+  12%,
+  100% {
+    border-color: rgba(255, 208, 90, 0.58);
+    box-shadow:
+      0 24px 80px rgba(0, 0, 0, 0.38),
+      0 0 30px rgba(255, 208, 90, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  }
+
+  5% {
+    border-color: rgba(255, 225, 142, 0.95);
+    box-shadow:
+      0 24px 80px rgba(0, 0, 0, 0.38),
+      0 0 44px rgba(255, 208, 90, 0.28),
+      inset 0 0 22px rgba(255, 216, 113, 0.08);
+  }
+}
+
+@keyframes leader-sheen {
+  0%,
+  2% {
+    left: -55%;
+    opacity: 0;
+  }
+
+  4% {
+    opacity: 0.42;
+  }
+
+  10% {
+    left: 125%;
+    opacity: 0;
+  }
+
+  100% {
+    left: 125%;
+    opacity: 0;
+  }
+}
+
+@keyframes leader-spotlight {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes leader-crown {
+  0%,
+  100% {
+    transform: translateY(-1px) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(1deg);
+  }
+}
+
+@media (min-width: 1100px) and (min-aspect-ratio: 8 / 5) {
+  .podium-card.first {
+    padding-top: 2.35vw;
+    padding-bottom: 2.35vw;
+  }
+
+  .leader-badge {
+    top: 0.72vw;
+    padding: 0.32vw 0.65vw;
+    font-size: 0.58vw;
+  }
+
+  .leader-footer {
+    bottom: 0.68vw;
+    left: 1.4vw;
+    gap: 0.55vw;
+    font-size: 0.58vw;
+  }
+
+  .leader-gap {
+    padding: 0.28vw 0.48vw;
+  }
+}
+
+@media (max-width: 720px) {
+  .podium-card.first {
+    min-height: 176px;
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  .leader-badge {
+    top: 13px;
+  }
+
+  .leader-footer {
+    right: 16px;
+    bottom: 13px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .podium-card.first,
+  .podium-card.first .podium-rank::before,
+  .leader-spotlight {
+    animation: none;
+  }
+
+  .leader-sheen {
+    display: none;
+  }
+}
