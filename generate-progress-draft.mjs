@@ -3,12 +3,14 @@ import path from "node:path";
 
 const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
+const SNAPSHOT_DIR = "data/progress-snapshots";
 const OUTPUT_DIR = "generated";
 const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 
 const targetDate = process.env.TARGET_DATE?.trim();
 const apiKey = process.env.GEMINI_API_KEY?.trim();
 const model = process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL;
+const saveSnapshot = process.env.SAVE_SNAPSHOT?.trim().toLowerCase() === "true";
 
 if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate ?? "")) {
   throw new Error("TARGET_DATE must use YYYY-MM-DD format.");
@@ -106,6 +108,159 @@ function normalizeRankings(items) {
     .sort((a, b) => a.rank - b.rank || b.score - a.score);
 }
 
+function dateInTimeZone(value, timeZone = "Asia/Manila") {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone,
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getDataFreshness(updatedAt) {
+  const dataDate = dateInTimeZone(updatedAt);
+
+  if (!dataDate) {
+    return {
+      dataDate: null,
+      status: "unknown",
+      isFreshForTargetDate: false,
+    };
+  }
+
+  if (dataDate === targetDate) {
+    return {
+      dataDate,
+      status: "current_target_date",
+      isFreshForTargetDate: true,
+    };
+  }
+
+  return {
+    dataDate,
+    status: dataDate < targetDate ? "older_than_target_date" : "newer_than_target_date",
+    isFreshForTargetDate: false,
+  };
+}
+
+async function loadPreviousSnapshot(monthKey) {
+  let files;
+
+  try {
+    files = await fs.readdir(SNAPSHOT_DIR);
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw new Error(`Could not read ${SNAPSHOT_DIR}: ${error.message}`);
+  }
+
+  const previousDate = files
+    .map((file) => file.match(/^(\d{4}-\d{2}-\d{2})\.json$/)?.[1] ?? null)
+    .filter(
+      (date) =>
+        date &&
+        date.startsWith(`${monthKey}-`) &&
+        date < targetDate,
+    )
+    .sort()
+    .at(-1);
+
+  if (!previousDate) return null;
+
+  const file = path.join(SNAPSHOT_DIR, `${previousDate}.json`);
+  const snapshot = await readJson(file);
+  const rankings = normalizeRankings(snapshot?.rankings);
+
+  if (rankings.length === 0) return null;
+
+  return {
+    snapshotDate: snapshot.snapshotDate ?? previousDate,
+    month: snapshot.month ?? monthKey,
+    dataUpdatedAt: snapshot.dataUpdatedAt ?? null,
+    rankings,
+    file,
+  };
+}
+
+function compareRankings(currentRankings, previousSnapshot) {
+  if (!previousSnapshot) {
+    return {
+      previousSnapshotAvailable: false,
+      previousSnapshotDate: null,
+      previousLeader: null,
+      leaderChanged: false,
+      rankChanges: [],
+      scoreImprovements: [],
+      newEntries: [],
+    };
+  }
+
+  const previousByPlayer = new Map(
+    previousSnapshot.rankings.map((item) => [item.player, item]),
+  );
+  const currentLeader = currentRankings[0] ?? null;
+  const previousLeader = previousSnapshot.rankings[0] ?? null;
+
+  const rankChanges = [];
+  const scoreImprovements = [];
+  const newEntries = [];
+
+  for (const current of currentRankings) {
+    const previous = previousByPlayer.get(current.player);
+
+    if (!previous) {
+      newEntries.push({
+        player: current.player,
+        rank: current.rank,
+        score: current.score,
+      });
+      continue;
+    }
+
+    if (current.rank !== previous.rank) {
+      rankChanges.push({
+        player: current.player,
+        previousRank: previous.rank,
+        currentRank: current.rank,
+        movement: current.rank < previous.rank ? "up" : "down",
+      });
+    }
+
+    if (current.score > previous.score) {
+      scoreImprovements.push({
+        player: current.player,
+        previousScore: previous.score,
+        currentScore: current.score,
+        improvement: current.score - previous.score,
+      });
+    }
+  }
+
+  return {
+    previousSnapshotAvailable: true,
+    previousSnapshotDate: previousSnapshot.snapshotDate,
+    previousLeader,
+    leaderChanged:
+      Boolean(currentLeader && previousLeader) &&
+      currentLeader.player !== previousLeader.player,
+    rankChanges,
+    scoreImprovements,
+    newEntries,
+  };
+}
+
 async function loadRankingForMonth(monthKey) {
   const history = await readJson(HISTORY_FILE);
   const savedMonth = history?.months?.[monthKey];
@@ -144,10 +299,13 @@ async function loadRankingForMonth(monthKey) {
   };
 }
 
-function buildFacts(schedule, rankingData) {
+function buildFacts(schedule, rankingData, previousSnapshot) {
   const top3 = rankingData.rankings.slice(0, 3);
   const leader = top3[0] ?? null;
   const runnerUp = top3[1] ?? null;
+  const gap = leader && runnerUp ? leader.score - runnerUp.score : null;
+  const freshness = getDataFreshness(rankingData.updatedAt);
+  const comparison = compareRankings(rankingData.rankings, previousSnapshot);
 
   return {
     snapshotDate: targetDate,
@@ -160,11 +318,17 @@ function buildFacts(schedule, rankingData) {
     currentTop3: top3,
     leader,
     runnerUp,
-    gapBetweenFirstAndSecond:
-      leader && runnerUp ? leader.score - runnerUp.score : null,
+    gapBetweenFirstAndSecond: gap,
+    topTwoGapIsSmall:
+      gap !== null &&
+      leader !== null &&
+      (gap <= 30 || gap / leader.score <= 0.08),
     dataUpdatedAt: rankingData.updatedAt,
+    dataDateInPhilippines: freshness.dataDate,
+    dataFreshnessStatus: freshness.status,
+    dataIsFreshForTargetDate: freshness.isFreshForTargetDate,
     dataSource: rankingData.source,
-    previousSnapshotAvailable: false,
+    ...comparison,
   };
 }
 
@@ -179,6 +343,7 @@ Use only the supplied facts. Never invent visits, attempts, effort, reactions, m
 rank changes, previous-week comparisons, or player relationships.
 Do not say the ranking is fierce, intense, close, dramatic, or competitive unless the facts clearly
 support that wording. If the gap is not clearly small, present the leader's score as the score to beat.
+When topTwoGapIsSmall is true, explicitly mention the runner-up and the exact point gap in the caption.
 
 Keep public copy concise, natural, and suitable for Facebook and Instagram in the Philippines.
 Use English for public-facing copy. Do not mention the ranking entry count in public-facing copy.
@@ -189,8 +354,11 @@ Image copy must be brief and readable on a 4:5 social image. The image headline 
 prioritize the current No.1, score to beat, gap when useful, or time remaining. Do not put hashtags in
 image copy. The caption may use no more than three relevant hashtags.
 
-There is no previous progress snapshot in this first manual version. Do not imply any change from an
-earlier week.
+Do not imply any change from an earlier week unless previousSnapshotAvailable is true. When comparison
+data is available, prioritize a verified new No.1, upward rank movement, or score improvement over
+generic progress wording.
+
+Avoid awkward repetition such as "Can you beat the score to beat?" Use one natural challenge instead.
 
 Return valid JSON only. Follow the requested keys exactly.
 `;
@@ -212,8 +380,32 @@ Return this JSON object:
 }
 
 Set publishRecommendation to "review" if there is only one ranking entry or the facts are too limited
-to present a meaningful current race. Otherwise use "publish".
+to present a meaningful current race. Also use "review" when dataIsFreshForTargetDate is false.
+Otherwise use "publish".
 `;
+}
+
+function applyDeterministicReview(draft, facts) {
+  const reasons = [];
+
+  if (!facts.dataIsFreshForTargetDate) {
+    reasons.push(
+      `ranking data date is ${facts.dataDateInPhilippines ?? "unknown"}, not ${targetDate}`,
+    );
+  }
+
+  if (facts.rankingEntryCount <= 1) {
+    reasons.push("the ranking has one or fewer entries");
+  }
+
+  if (reasons.length === 0) return draft;
+
+  return {
+    ...draft,
+    internalReviewNote:
+      `${draft.internalReviewNote}\n\n自動確認: ${reasons.join("; ")}。投稿前に最新データを確認してください。`,
+    publishRecommendation: "review",
+  };
 }
 
 function extractResponseText(payload) {
@@ -327,7 +519,56 @@ function formatTop3(top3) {
     .join("\n");
 }
 
-function buildMarkdown({ schedule, facts, draft, generatedAt }) {
+function formatComparison(facts) {
+  if (!facts.previousSnapshotAvailable) {
+    return "- Previous snapshot: Not available";
+  }
+
+  const lines = [
+    `- Previous snapshot: ${facts.previousSnapshotDate}`,
+    `- Leader changed: ${facts.leaderChanged ? "Yes" : "No"}`,
+  ];
+
+  if (facts.rankChanges.length > 0) {
+    lines.push(
+      `- Rank changes: ${facts.rankChanges
+        .map(
+          (item) =>
+            `${item.player} No.${item.previousRank} → No.${item.currentRank}`,
+        )
+        .join(", ")}`,
+    );
+  } else {
+    lines.push("- Rank changes: None");
+  }
+
+  if (facts.scoreImprovements.length > 0) {
+    lines.push(
+      `- Score improvements: ${facts.scoreImprovements
+        .map(
+          (item) =>
+            `${item.player} ${item.previousScore} → ${item.currentScore} (+${item.improvement})`,
+        )
+        .join(", ")}`,
+    );
+  } else {
+    lines.push("- Score improvements: None");
+  }
+
+  if (facts.newEntries.length > 0) {
+    lines.push(
+      `- New entries: ${facts.newEntries
+        .map((item) => `${item.player} (No.${item.rank}, ${item.score})`)
+        .join(", ")}`,
+    );
+  } else {
+    lines.push("- New entries: None");
+  }
+
+  return lines.join("\n");
+}
+
+function buildMarkdown({ schedule, facts, draft, generatedAt, snapshotResult }) {
   const gap = facts.gapBetweenFirstAndSecond;
 
   return `# AFTER Ranking Progress Draft
@@ -340,7 +581,9 @@ function buildMarkdown({ schedule, facts, draft, generatedAt }) {
 - Model: ${model}
 - Generated at: ${generatedAt}
 - Ranking data updated at: ${facts.dataUpdatedAt ?? "Unknown"}
-- Previous snapshot comparison: Not available in this manual version
+- Data freshness: ${facts.dataFreshnessStatus}
+- Previous snapshot comparison: ${facts.previousSnapshotAvailable ? `Compared with ${facts.previousSnapshotDate}` : "Not available"}
+- Snapshot status: ${snapshotResult.status}
 - Publish recommendation: ${draft.publishRecommendation.toUpperCase()}
 
 ## Image headline
@@ -379,13 +622,42 @@ ${draft.internalReviewNote}
 
 ${formatTop3(facts.currentTop3)}
 
+### Comparison with previous progress snapshot
+
+${formatComparison(facts)}
+
 ## Required human check
 
-Confirm the player names, scores, data freshness, and wording before posting. This version does not compare the ranking with a previous progress snapshot.
+Confirm the player names, scores, data freshness, comparison facts, and wording before posting.
 `;
 }
 
-async function writeNoDataDraft(schedule, facts, generatedAt) {
+async function writeSnapshot(schedule, facts, rankings) {
+  if (!saveSnapshot) {
+    return { status: "not_requested", file: null };
+  }
+
+  if (!facts.dataIsFreshForTargetDate || facts.rankingEntryCount === 0) {
+    return { status: "skipped_unsafe_data", file: null };
+  }
+
+  const file = path.join(SNAPSHOT_DIR, `${targetDate}.json`);
+  const snapshot = {
+    snapshotDate: targetDate,
+    month: schedule.monthKey,
+    stage: schedule.stage,
+    daysRemaining: schedule.daysRemaining,
+    dataUpdatedAt: facts.dataUpdatedAt,
+    rankings,
+  };
+
+  await fs.mkdir(SNAPSHOT_DIR, { recursive: true });
+  await fs.writeFile(file, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+
+  return { status: "written", file };
+}
+
+function writeNoDataDraft() {
   const draft = {
     imageHeadline: "RANKING DATA REVIEW",
     imageText: "No current-month ranking data was available.",
@@ -396,16 +668,14 @@ async function writeNoDataDraft(schedule, facts, generatedAt) {
     publishRecommendation: "review",
   };
 
-  return {
-    draft,
-    markdown: buildMarkdown({ schedule, facts, draft, generatedAt }),
-  };
+  return { draft };
 }
 
 async function main() {
   const schedule = getScheduleContext(targetDate);
   const rankingData = await loadRankingForMonth(schedule.monthKey);
-  const facts = buildFacts(schedule, rankingData);
+  const previousSnapshot = await loadPreviousSnapshot(schedule.monthKey);
+  const facts = buildFacts(schedule, rankingData, previousSnapshot);
   const generatedAt = new Date().toISOString();
 
   console.log(`Selected model: ${model}`);
@@ -415,19 +685,24 @@ async function main() {
 
   const result =
     facts.rankingEntryCount === 0
-      ? await writeNoDataDraft(schedule, facts, generatedAt)
+      ? writeNoDataDraft()
       : {
-          draft: await geminiRequest(facts),
+          draft: applyDeterministicReview(await geminiRequest(facts), facts),
         };
 
-  const markdown =
-    result.markdown ??
-    buildMarkdown({
-      schedule,
-      facts,
-      draft: result.draft,
-      generatedAt,
-    });
+  const snapshotResult = await writeSnapshot(
+    schedule,
+    facts,
+    rankingData.rankings,
+  );
+
+  const markdown = buildMarkdown({
+    schedule,
+    facts,
+    draft: result.draft,
+    generatedAt,
+    snapshotResult,
+  });
 
   const json = {
     generation: {
@@ -436,6 +711,7 @@ async function main() {
       stage: schedule.stage,
       model,
       generatedAt,
+      snapshot: snapshotResult,
     },
     facts,
     draft: result.draft,
@@ -454,6 +730,8 @@ async function main() {
 
   console.log(`Saved ${markdownFile}`);
   console.log(`Saved ${jsonFile}`);
+  console.log(`Snapshot status: ${snapshotResult.status}`);
+  if (snapshotResult.file) console.log(`Saved ${snapshotResult.file}`);
 }
 
 main().catch((error) => {
