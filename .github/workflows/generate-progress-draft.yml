@@ -4,15 +4,18 @@ on:
   workflow_dispatch:
     inputs:
       target_date:
-        description: "Progress date in YYYY-MM-DD format"
-        required: true
-        default: "2026-08-08"
+        description: "Progress date in YYYY-MM-DD format (blank = today in PHT)"
+        required: false
+        default: ""
         type: string
       save_snapshot:
         description: "Save a comparison snapshot when the ranking data is from the target date"
         required: true
         default: false
         type: boolean
+  schedule:
+    - cron: "13 15 * * *"
+      timezone: "Asia/Manila"
 
 permissions:
   contents: write
@@ -24,36 +27,113 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Determine target date and schedule
+        id: schedule
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_TARGET_DATE: ${{ inputs.target_date }}
+          MANUAL_SAVE_SNAPSHOT: ${{ inputs.save_snapshot }}
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+
+          const eventName = process.env.EVENT_NAME;
+          const manualDate = (process.env.MANUAL_TARGET_DATE || "").trim();
+
+          const parts = Object.fromEntries(
+            new Intl.DateTimeFormat("en-CA", {
+              timeZone: "Asia/Manila",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+              .formatToParts(new Date())
+              .filter((part) => part.type !== "literal")
+              .map((part) => [part.type, part.value]),
+          );
+
+          const todayInPht = `${parts.year}-${parts.month}-${parts.day}`;
+          const targetDate = eventName === "workflow_dispatch"
+            ? manualDate || todayInPht
+            : todayInPht;
+
+          const match = targetDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+          if (!match) {
+            throw new Error("target_date must use YYYY-MM-DD format.");
+          }
+
+          const year = Number(match[1]);
+          const month = Number(match[2]);
+          const day = Number(match[3]);
+          const parsed = new Date(Date.UTC(year, month - 1, day));
+
+          if (
+            parsed.getUTCFullYear() !== year ||
+            parsed.getUTCMonth() !== month - 1 ||
+            parsed.getUTCDate() !== day
+          ) {
+            throw new Error(`Invalid target_date: ${targetDate}`);
+          }
+
+          const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+          const finalChallengeDay = lastDay - 3;
+          const scheduledDays = [8, 15, 22, finalChallengeDay];
+          const isManual = eventName === "workflow_dispatch";
+          const shouldRun = isManual || scheduledDays.includes(day);
+          const saveSnapshot = isManual
+            ? process.env.MANUAL_SAVE_SNAPSHOT === "true"
+            : true;
+
+          const output = [
+            `target_date=${targetDate}`,
+            `should_run=${shouldRun}`,
+            `save_snapshot=${saveSnapshot}`,
+            `final_challenge_day=${finalChallengeDay}`,
+          ].join("\n") + "\n";
+
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, output);
+
+          console.log(`Event: ${eventName}`);
+          console.log(`PHT target date: ${targetDate}`);
+          console.log(`Scheduled days this month: 8, 15, 22, ${finalChallengeDay}`);
+          console.log(`Generate draft: ${shouldRun}`);
+          console.log(`Save snapshot: ${saveSnapshot}`);
+          NODE
+
       - name: Check out repository
+        if: steps.schedule.outputs.should_run == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Node.js
+        if: steps.schedule.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
       - name: Generate ranking progress draft
+        if: steps.schedule.outputs.should_run == 'true'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          TARGET_DATE: ${{ inputs.target_date }}
-          SAVE_SNAPSHOT: ${{ inputs.save_snapshot }}
+          TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
+          SAVE_SNAPSHOT: ${{ steps.schedule.outputs.save_snapshot }}
         run: node generate-progress-draft.mjs
 
       - name: Upload generated draft
+        if: steps.schedule.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ranking-progress-draft-${{ inputs.target_date }}
+          name: ranking-progress-draft-${{ steps.schedule.outputs.target_date }}
           path: |
-            generated/progress-draft-${{ inputs.target_date }}.md
-            generated/progress-draft-${{ inputs.target_date }}.json
-            data/progress-snapshots/${{ inputs.target_date }}.json
+            generated/progress-draft-${{ steps.schedule.outputs.target_date }}.md
+            generated/progress-draft-${{ steps.schedule.outputs.target_date }}.json
+            data/progress-snapshots/${{ steps.schedule.outputs.target_date }}.json
           if-no-files-found: error
           retention-days: 14
 
       - name: Commit ranking progress snapshot
-        if: ${{ inputs.save_snapshot }}
+        if: steps.schedule.outputs.should_run == 'true' && steps.schedule.outputs.save_snapshot == 'true'
         env:
-          TARGET_DATE: ${{ inputs.target_date }}
+          TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
         run: |
           set -euo pipefail
 
@@ -78,9 +158,10 @@ jobs:
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Create or update draft issue
+        if: steps.schedule.outputs.should_run == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_DATE: ${{ inputs.target_date }}
+          TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
         run: |
           set -euo pipefail
 
@@ -146,3 +227,12 @@ jobs:
             echo "Created Issue:"
             echo "$ISSUE_URL"
           fi
+
+      - name: Report non-scheduled day
+        if: steps.schedule.outputs.should_run != 'true'
+        env:
+          TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
+          FINAL_CHALLENGE_DAY: ${{ steps.schedule.outputs.final_challenge_day }}
+        run: |
+          echo "${TARGET_DATE} is not a progress-post date."
+          echo "This month runs on the 8th, 15th, 22nd, and day ${FINAL_CHALLENGE_DAY}."
