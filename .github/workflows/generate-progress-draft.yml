@@ -8,9 +8,14 @@ on:
         required: true
         default: "2026-08-08"
         type: string
+      save_snapshot:
+        description: "Save a comparison snapshot when the ranking data is from the target date"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate:
@@ -30,6 +35,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TARGET_DATE: ${{ inputs.target_date }}
+          SAVE_SNAPSHOT: ${{ inputs.save_snapshot }}
         run: node generate-progress-draft.mjs
 
       - name: Upload generated draft
@@ -39,5 +45,33 @@ jobs:
           path: |
             generated/progress-draft-${{ inputs.target_date }}.md
             generated/progress-draft-${{ inputs.target_date }}.json
+            data/progress-snapshots/${{ inputs.target_date }}.json
           if-no-files-found: error
           retention-days: 14
+
+      - name: Commit ranking progress snapshot
+        if: ${{ inputs.save_snapshot }}
+        env:
+          TARGET_DATE: ${{ inputs.target_date }}
+        run: |
+          set -euo pipefail
+
+          SNAPSHOT_FILE="data/progress-snapshots/${TARGET_DATE}.json"
+
+          if [ ! -f "$SNAPSHOT_FILE" ]; then
+            echo "Snapshot was not saved because the ranking data was not safe for the target date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$SNAPSHOT_FILE"
+
+          if git diff --cached --quiet; then
+            echo "Snapshot is already up to date."
+            exit 0
+          fi
+
+          git commit -m "Save ranking progress snapshot ${TARGET_DATE}"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
