@@ -184,7 +184,7 @@
   }
 
   50% {
-    transform: translateY(calc(-50% - 4px)) rotate(0.25deg);
+    transform: translateY(calc(-50% - 5px)) rotate(0.25deg);
   }
 }
 
