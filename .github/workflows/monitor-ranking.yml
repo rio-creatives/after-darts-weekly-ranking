@@ -1,0 +1,144 @@
+name: Monitor ranking updates
+
+on:
+  schedule:
+    # 30分ごとに監視（GitHub ActionsのcronはUTC）
+    - cron: "12,42 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: monitor-ranking-updates
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check last ranking update and manage alert
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+
+            const thresholdHours = 3;
+            const thresholdMilliseconds = thresholdHours * 60 * 60 * 1000;
+            const alertTitle = "Ranking update stopped for 3+ hours";
+            const { owner, repo } = context.repo;
+
+            let ranking;
+            let lastUpdated;
+            let elapsedMilliseconds;
+            let problemDetails;
+
+            try {
+              ranking = JSON.parse(
+                fs.readFileSync("data/ranking.json", "utf8")
+              );
+              lastUpdated = Date.parse(ranking.updatedAt);
+
+              if (!Number.isFinite(lastUpdated)) {
+                problemDetails =
+                  "`data/ranking.json`の`updatedAt`が無効です。";
+              } else {
+                elapsedMilliseconds = Date.now() - lastUpdated;
+              }
+            } catch (error) {
+              problemDetails =
+                `\`data/ranking.json\`を確認できませんでした: ${error.message}`;
+            }
+
+            const isStale =
+              Boolean(problemDetails) ||
+              elapsedMilliseconds >= thresholdMilliseconds;
+
+            const openIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: "open",
+                per_page: 100,
+              }
+            );
+
+            const existingAlert = openIssues.find(
+              (issue) => !issue.pull_request && issue.title === alertTitle
+            );
+
+            if (isStale) {
+              if (existingAlert) {
+                core.info(
+                  `Alert already exists: #${existingAlert.number}. No duplicate notification sent.`
+                );
+                return;
+              }
+
+              const checkedAt = new Date().toISOString();
+              const elapsedText = Number.isFinite(elapsedMilliseconds)
+                ? `${(elapsedMilliseconds / 60 / 60 / 1000).toFixed(1)} hours`
+                : "unknown";
+              const updatedAtText = Number.isFinite(lastUpdated)
+                ? new Date(lastUpdated).toISOString()
+                : "invalid or unavailable";
+
+              const body = [
+                `@${owner} AFTERのランキング更新が3時間以上停止しています。`,
+                "",
+                `- 最終更新: ${updatedAtText}`,
+                `- 経過時間: ${elapsedText}`,
+                `- 監視時刻: ${checkedAt}`,
+                problemDetails ? `- 詳細: ${problemDetails}` : "",
+                "",
+                "更新処理のGitHub Actionsログを確認してください。",
+                "復旧を検知すると、このIssueは自動的に閉じられます。",
+              ].filter(Boolean).join("\n");
+
+              try {
+                await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title: alertTitle,
+                  body,
+                  assignees: [owner],
+                });
+              } catch (error) {
+                if (error.status !== 422) throw error;
+
+                core.warning(
+                  `Could not assign ${owner}; creating the alert without an assignee.`
+                );
+                await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title: alertTitle,
+                  body,
+                });
+              }
+
+              core.warning("Ranking update alert created.");
+              return;
+            }
+
+            if (existingAlert) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existingAlert.number,
+                state: "closed",
+                state_reason: "completed",
+              });
+              core.info(
+                `Ranking updates recovered. Alert #${existingAlert.number} was closed.`
+              );
+            } else {
+              core.info("Ranking update is healthy. No alert is needed.");
+            }
