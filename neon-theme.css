@@ -165,6 +165,10 @@ body {
   mix-blend-mode: normal !important;
 }
 
+.dartslive-logo-frame--mobile {
+  display: none;
+}
+
 .live-status {
     display: flex;
   align-items: center;
@@ -467,25 +471,52 @@ h1 span {
   }
 
   .brand {
-    min-height: 76px;
+    min-width: 0;
+    min-height: 0;
   }
 
   .topbar {
-  padding-bottom: 72px;
-}
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 12px;
+    min-height: 84px;
+    padding-bottom: 8px;
+  }
 
-.dartslive-logo-frame {
-  width: 170px;
-  transform: none;
-}
+  .brand-logo-frame {
+    left: -8px;
+    width: min(42vw, 164px);
+    height: 84px;
+  }
 
-.brand-logo-frame {
-  width: 190px;
-  height: 110px;
-}
+  .dartslive-logo-frame--header {
+    display: none;
+  }
+
+  .dartslive-logo-frame--mobile {
+    display: block;
+    width: 30vw;
+    margin: 0 auto 12px;
+  }
+
+  .dartslive-logo-frame--mobile .dartslive-logo {
+    width: 100%;
+  }
+
+  .live-status {
+    gap: 7px;
+    padding: 8px 10px;
+    font-size: clamp(9px, 2.7vw, 12px);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  .live-dot {
+    width: 9px;
+    height: 9px;
+  }
 
   .hero {
-    margin-top: 32px;
+    margin-top: 24px;
   }
 
   .podium {
