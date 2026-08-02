@@ -343,6 +343,23 @@ The internal report must be in Japanese.
 Keep the tone confident and competitive, but not aggressive.
 Do not insult or pressure players.
 
+Do not describe the competition as fierce, intense, close,
+dramatic, or competitive unless the supplied facts clearly
+support that description.
+
+Do not mention the ranking entry count in public-facing copy.
+The entry count may only be used in the internal report.
+
+Mention the bottle reward only once, in one short sentence
+near the end of the caption.
+
+The internal report's nextAction must be one specific,
+low-cost action that can realistically be completed by
+one small bar with fewer than 50 seats.
+
+Do not say that an activity will be continued unless the
+supplied facts confirm that it is already being performed.
+
 Facebook hashtags must be limited to a maximum of three.
 
 The number supplied is ranking entries, not necessarily
@@ -368,7 +385,7 @@ Return exactly this JSON structure:
   "internalReport": {
     "summary": "Japanese summary based only on the data",
     "comparison": "Japanese comparison with the previous month, or clearly state that comparison data is unavailable",
-    "nextAction": "One realistic action for the following month in Japanese",
+    "nextAction": "One specific and realistic action for the following month in Japanese. It must state what to do and when to do it. Do not give a generic recommendation.",
     "dataLimitations": "Japanese explanation of what cannot be concluded from the available data"
   }
 }
