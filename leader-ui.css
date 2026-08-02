@@ -7,7 +7,11 @@
   isolation: isolate;
   padding-top: clamp(44px, 3vw, 58px);
   padding-bottom: clamp(38px, 3vw, 52px);
-  animation: leader-aura 12s ease-in-out infinite;
+  animation: leader-aura 4s ease-in-out infinite;
+}
+.podium-card.first::before {
+  transform-origin: 50% 50%;
+  animation: leader-darts-float 4.2s ease-in-out infinite;
 }
 
 .leader-badge {
@@ -99,7 +103,7 @@
   );
   opacity: 0;
   transform: rotate(17deg);
-  animation: leader-sheen 12s ease-in-out infinite;
+  animation: leader-sheen 4s ease-in-out infinite;
 }
 
 .podium-card.first .podium-rank::before {
@@ -173,6 +177,17 @@
   }
 }
 
+@keyframes leader-darts-float {
+  0%,
+  100% {
+    transform: translateY(-50%) rotate(-0.25deg);
+  }
+
+  50% {
+    transform: translateY(calc(-50% - 4px)) rotate(0.25deg);
+  }
+}
+
 @media (min-width: 1100px) and (min-aspect-ratio: 8 / 5) {
   .podium-card.first {
     padding-top: 2.35vw;
@@ -218,6 +233,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .podium-card.first,
+  .podium-card.first::before,
   .podium-card.first .podium-rank::before,
   .leader-spotlight {
     animation: none;
