@@ -77,40 +77,43 @@ async function selectModel() {
     );
   }
 
-const preferredModels = [
-  "models/gemini-3.5-flash-lite",
-  "models/gemini-3.6-flash",
-  "models/gemini-3.5-flash",
-  "models/gemini-3.1-flash-lite",
-  "models/gemini-3-flash-preview",
-];
+  const preferredModels = [
+    "models/gemini-3.1-flash-lite",
+    "models/gemini-3.5-flash-lite",
+    "models/gemini-3.6-flash",
+    "models/gemini-3.5-flash",
+    "models/gemini-3-flash-preview",
+  ];
 
   const preferredModel = preferredModels.find((name) =>
     availableModels.some((model) => model.name === name)
   );
 
-const fallbackModel =
-  availableModels.find(
+  if (preferredModel) {
+    return preferredModel;
+  }
+
+  const fallbackModel = availableModels.find(
     (model) =>
       model.name.startsWith("models/gemini-3") &&
-      model.name.includes("flash-lite")
-  ) ||
-  availableModels.find(
-    (model) =>
-      model.name.startsWith("models/gemini-3") &&
-      model.name.includes("flash")
-  ) ||
-  availableModels.find((model) =>
-    model.name.startsWith("models/gemini-3")
+      model.name.includes("flash") &&
+      !/image|live|audio|tts/i.test(model.name)
   );
 
-if (!preferredModel && !fallbackModel) {
-  throw new Error(
-    "No supported Gemini 3 text-generation model was found."
-  );
+  if (!fallbackModel) {
+    console.error("Available Gemini models:");
+
+    for (const model of availableModels) {
+      console.error(`- ${model.name}`);
+    }
+
+    throw new Error(
+      "No supported Gemini 3 Flash model was found."
+    );
+  }
+
+  return fallbackModel.name;
 }
-
-return preferredModel || fallbackModel.name;
 
 function extractResponseText(response) {
   return (response.candidates?.[0]?.content?.parts || [])
