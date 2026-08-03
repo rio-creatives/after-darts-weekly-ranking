@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-04T00:13:35+08:00",
+  "lastSuccessfulCheckAt": "2026-08-04T00:57:07+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
@@ -59,32 +59,32 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-04T00:13:35+08:00",
+      "updatedAt": "2026-08-04T00:57:07+08:00",
       "rankings": [
         {
           "rank": 1,
+          "player": "AKO",
+          "score": 484
+        },
+        {
+          "rank": 2,
           "player": "KEISUKE",
           "score": 471
         },
         {
-          "rank": 2,
+          "rank": 3,
           "player": "YUTA",
           "score": 451
         },
         {
-          "rank": 3,
+          "rank": 4,
           "player": "ROSE",
           "score": 427
         },
         {
-          "rank": 4,
+          "rank": 5,
           "player": "Queen",
           "score": 422
-        },
-        {
-          "rank": 5,
-          "player": "AKO",
-          "score": 363
         },
         {
           "rank": 6,
