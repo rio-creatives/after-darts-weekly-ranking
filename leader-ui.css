@@ -102,8 +102,11 @@
     transparent
   );
   opacity: 0;
-  transform: rotate(17deg);
-  animation: leader-sheen 6s ease-in-out infinite;
+  transform: translate3d(0, 0, 0) rotate(17deg);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  animation: leader-sheen 6s linear infinite;
 }
 
 .podium-card.first .podium-rank::before {
@@ -123,32 +126,35 @@
   }
 
   5% {
-    border-color: rgba(255, 225, 142, 0.95);
+    border-color: rgba(255, 225, 142, 0.76);
     box-shadow:
       0 24px 80px rgba(0, 0, 0, 0.38),
-      0 0 44px rgba(255, 208, 90, 0.28),
-      inset 0 0 22px rgba(255, 216, 113, 0.08);
+      0 0 38px rgba(255, 208, 90, 0.18),
+      inset 0 0 18px rgba(255, 216, 113, 0.055);
   }
 }
 
 @keyframes leader-sheen {
+  /* Keep the reset invisible, then cross the card in about 1.4 seconds. */
   0%,
-  2% {
-    left: -55%;
+  62% {
+    transform: translate3d(0, 0, 0) rotate(17deg);
     opacity: 0;
   }
 
-  4% {
-    opacity: 0.42;
+  65% {
+    transform: translate3d(85%, 0, 0) rotate(17deg);
+    opacity: 0.3;
   }
 
-  10% {
-    left: 125%;
-    opacity: 0;
+  80% {
+    transform: translate3d(510%, 0, 0) rotate(17deg);
+    opacity: 0.3;
   }
 
+  85%,
   100% {
-    left: 125%;
+    transform: translate3d(650%, 0, 0) rotate(17deg);
     opacity: 0;
   }
 }
