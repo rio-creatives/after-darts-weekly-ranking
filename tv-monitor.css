@@ -20,8 +20,14 @@
     --tv-side-card-width: 1fr;
 
     /* Overall vertical allocation: top three / ranks 4-11. */
-    --tv-podium-area: 56fr;
-    --tv-ranking-list-area: 44fr;
+    --tv-podium-area: 72fr;
+    --tv-ranking-list-area: 28fr;
+
+    /*
+     * Space below the hero title before the ranking cards.
+     * Increase this value for more space; decrease it for less space.
+     */
+    --tv-hero-bottom-space: 1.5vh;
   }
 
   html,
@@ -72,8 +78,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    margin: 0;
+    height: calc(100% - var(--tv-hero-bottom-space));
+    margin: 0 0 var(--tv-hero-bottom-space);
   }
 
   .eyebrow {
