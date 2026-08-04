@@ -1,38 +1,36 @@
 /*
  * Landscape TV layout.
- * Scales proportionally for 16:9 Full HD (1920 x 1080) and 4K (3840 x 2160).
- * Ranking data, card order and the mobile layout are unchanged.
+ * The upper area emphasizes the podium; ranks 4-11 stay in roughly the
+ * bottom third of the screen as a compact two-column grid.
  */
 
-/*
- * BrowseHere can report a 1920px TV as a 960px or 1024px CSS viewport.
- * Start the TV layout at 800px so the fixed-height dashboard still applies.
- */
 @media (min-width: 800px) and (min-aspect-ratio: 8 / 5) {
   html,
   body {
+    width: 100%;
     height: 100%;
     overflow: hidden;
   }
 
   .screen {
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: 8.5vh 10.5vh minmax(0, 1fr) 2.5vh;
     width: 100vw;
     height: 100vh;
     min-height: 100vh;
-    padding: 1.6vh 4.2vw 1.3vh;
+    padding: 1.4vh 4.2vw 1.2vh;
   }
 
   .topbar {
-    min-height: 8.5vh;
-    padding-bottom: 0.6vh;
+    height: 100%;
+    min-height: 0;
+    padding-bottom: 0.7vh;
   }
 
   .brand-logo-frame {
     left: 0;
-    width: 14vw;
-    height: 7.5vh;
+    width: 13vw;
+    height: 7.6vh;
   }
 
   .dartslive-logo-frame {
@@ -41,135 +39,154 @@
 
   .live-status {
     gap: 0.55vw;
-    padding: 0.55vw 0.8vw;
-    font-size: 0.78vw;
+    padding: 0.48vw 0.75vw;
+    font-size: clamp(8px, 0.72vw, 14px);
   }
 
   .live-dot {
-    width: 0.64vw;
-    height: 0.64vw;
+    width: clamp(7px, 0.6vw, 12px);
+    height: clamp(7px, 0.6vw, 12px);
   }
 
   .hero {
-    margin: 1vh auto 1.4vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    margin: 0;
   }
 
   .eyebrow {
     margin-bottom: 0.45vh;
-    font-size: 0.82vw;
+    font-size: clamp(8px, 0.72vw, 14px);
   }
 
   h1 {
-    font-size: 3.45vw;
+    font-size: clamp(28px, 3.3vw, 64px);
   }
 
   .week-range {
     margin-top: 0.7vh;
-    font-size: 0.9vw;
+    font-size: clamp(8px, 0.78vw, 15px);
   }
 
   .ranking-content {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    width: 89vw;
+    grid-template-rows: minmax(0, 72fr) minmax(0, 28fr);
+    gap: 1.1vh;
+    width: 91vw;
     height: 100%;
     min-height: 0;
   }
 
   .podium {
+    grid-template-columns: 1fr 1.18fr 1fr;
+    align-items: stretch;
     gap: 1.15vw;
+    height: 100%;
+    min-height: 0;
   }
 
-  .podium-card {
-    min-height: 18vh;
-    padding: 1.2vw;
+  .podium-card,
+  .podium-card.first {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    min-height: 0;
+    padding: 1.8vw;
     border-radius: 1vw;
   }
 
   .podium-card.first {
-    min-height: 20vh;
-    transform: translateY(-0.45vh);
+    transform: none;
   }
 
   .podium-rank {
-    margin-bottom: 1.15vh;
-    font-size: 0.78vw;
+    margin-bottom: 1.6vh;
+    font-size: clamp(10px, 0.9vw, 17px);
   }
 
   .podium-rank::before {
-    width: 1.65vw;
-    height: 1.28vw;
+    width: clamp(22px, 2vw, 39px);
+    height: clamp(17px, 1.55vw, 30px);
   }
 
   .podium-rank strong {
-    font-size: 1.8vw;
+    font-size: clamp(24px, 2.5vw, 48px);
   }
 
   .rank-suffix {
-    font-size: 0.78vw;
+    font-size: clamp(10px, 0.9vw, 17px);
   }
 
   .player-name {
-    max-width: 61%;
-    font-size: 1.7vw;
+    max-width: 57%;
+    font-size: clamp(24px, 2.35vw, 46px);
   }
 
   .player-score {
-    margin-top: 0.65vh;
-    font-size: 3.35vw;
+    margin-top: 0.9vh;
+    font-size: clamp(52px, 5vw, 96px);
   }
 
   .ranking-list {
-    grid-auto-rows: minmax(0, 1fr);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--ranking-row-count, 4), minmax(0, 1fr));
+    grid-auto-flow: row;
     min-height: 0;
-    gap: 0.75vh 0.9vw;
-    margin-top: 1.2vh;
+    height: 100%;
+    gap: 0.55vh 0.85vw;
+    margin: 0;
   }
 
   .ranking-row {
     grid-template-columns: 3.2vw minmax(0, 1fr) auto;
     min-height: 0;
-    padding: 0 1.25vw;
-    border-radius: 0.75vw;
+    padding: 0 1.15vw;
+    border-radius: 0.65vw;
   }
 
   .row-rank {
-    font-size: 1.1vw;
+    font-size: clamp(11px, 1vw, 19px);
   }
 
   .row-name {
-    font-size: 1.18vw;
+    font-size: clamp(12px, 1.05vw, 20px);
   }
 
   .row-score {
-    font-size: 1.7vw;
+    font-size: clamp(17px, 1.55vw, 30px);
   }
 
   .empty-state {
     align-self: stretch;
-    width: 89vw;
+    width: 91vw;
     margin: 0 auto;
   }
 
   .footer {
-    width: 89vw;
-    margin-top: 0.8vh;
-    font-size: 0.68vw;
+    width: 91vw;
+    height: 100%;
+    margin-top: 0;
+    font-size: clamp(7px, 0.62vw, 12px);
   }
 
-  /* Podium artwork: percentage-based so it doubles cleanly from FHD to 4K. */
+  /* Podium artwork scales with the enlarged cards. */
   .podium-card.first::before {
-    right: 0.85vw;
-    width: 12.2vw;
+    right: 0.75vw;
+    width: 13.2vw;
   }
 
   .podium-card.second::before {
     right: 0;
-    width: 10.5vw;
+    width: 11.5vw;
   }
 
   .podium-card.third::before {
     right: 0;
-    width: 10.7vw;
+    width: 11.8vw;
   }
 }

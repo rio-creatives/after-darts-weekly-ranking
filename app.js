@@ -127,9 +127,10 @@ function render(data) {
     .filter(Boolean)
     .forEach((player) => podium.append(renderPodiumEntry(player)));
 
-  sorted
-    .filter((player) => player.rank > 3)
-    .forEach((player) => rankingList.append(renderListEntry(player)));
+  const listPlayers = sorted.filter((player) => player.rank > 3);
+  const rowCount = Math.min(4, Math.max(1, Math.ceil(listPlayers.length / 2)));
+  rankingList.style.setProperty("--ranking-row-count", String(rowCount));
+  listPlayers.forEach((player) => rankingList.append(renderListEntry(player)));
 }
 
 function loadRanking() {

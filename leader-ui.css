@@ -196,21 +196,22 @@
 
 @media (min-width: 800px) and (min-aspect-ratio: 8 / 5) {
   .podium-card.first {
-    padding-top: 2.05vw;
-    padding-bottom: 2.05vw;
+    padding-top: max(3.7vh, 28px);
+    padding-bottom: max(3.7vh, 28px);
   }
 
   .leader-badge {
-    top: 0.72vw;
-    padding: 0.32vw 0.65vw;
-    font-size: 0.58vw;
+    top: 1.5vh;
+    padding: 0.45vh 0.65vw;
+    font-size: clamp(9px, 0.72vw, 14px);
   }
 
   .leader-footer {
-    bottom: 0.68vw;
-    left: 1.4vw;
+    bottom: 1.4vh;
+    left: 1.5vw;
     gap: 0.55vw;
-    font-size: 0.58vw;
+    width: 60%;
+    font-size: clamp(8px, 0.65vw, 13px);
   }
 
   .leader-gap {
