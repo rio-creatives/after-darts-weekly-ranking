@@ -27,7 +27,7 @@
      * Space below the hero title before the ranking cards.
      * Increase this value for more space; decrease it for less space.
      */
-    --tv-hero-bottom-space: 1.5vh;
+    --tv-hero-bottom-space: 2vh;
   }
 
   html,
