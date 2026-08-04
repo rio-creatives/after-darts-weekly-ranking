@@ -221,7 +221,7 @@
   /* Podium artwork scales with the enlarged cards. */
   .podium-card.first::before {
     right: 0.75vw;
-    width: 11.6vw;
+    width: 14vw;
   }
 
   .podium-card.second::before {
