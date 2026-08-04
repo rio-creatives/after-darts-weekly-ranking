@@ -25,7 +25,7 @@
 
 /* 1位：ゴールド */
 .podium-card.first::before {
-  width: clamp(180px, 20vw, 245px);
+  width: clamp(200px, 30vw, 265px);
 
   /* 左右位置：大きくすると左へ、マイナスにすると右へ */
   right: 16px;
