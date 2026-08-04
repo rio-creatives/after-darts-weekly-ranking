@@ -1,6 +1,15 @@
 const DATA_URL =
   "https://raw.githubusercontent.com/rio-creatives/after-darts-weekly-ranking/main/data/ranking.json";
 const AUTO_REFRESH_MS = 5 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 20 * 1000;
+const STALE_SUCCESS_MS = 12 * 60 * 1000;
+const WATCHDOG_INTERVAL_MS = 60 * 1000;
+const RECOVERY_EVENT_DEBOUNCE_MS = 2 * 1000;
+
+let lastSuccessfulFetch = Date.now();
+let lastReloadAttempt = 0;
+let lastRecoveryRefresh = 0;
+let activeRankingRequest = null;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "Asia/Manila",
@@ -123,23 +132,71 @@ function render(data) {
     .forEach((player) => rankingList.append(renderListEntry(player)));
 }
 
-async function loadRanking() {
-  try {
-    const response = await fetch(`${DATA_URL}?v=${Date.now()}`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ranking request failed: ${response.status}`);
-    }
-
-    render(await response.json());
-  } catch (error) {
-    console.error(error);
-    document.querySelector("#weekRange").textContent =
-      "RANKING DATA TEMPORARILY UNAVAILABLE";
+function loadRanking() {
+  if (activeRankingRequest) {
+    return activeRankingRequest;
   }
+
+  activeRankingRequest = (async () => {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(
+      () => controller.abort(),
+      FETCH_TIMEOUT_MS,
+    );
+
+    try {
+      const response = await fetch(`${DATA_URL}?v=${Date.now()}`, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ranking request failed: ${response.status}`);
+      }
+
+      render(await response.json());
+      lastSuccessfulFetch = Date.now();
+    } catch (error) {
+      console.error(error);
+      document.querySelector("#weekRange").textContent =
+        "RANKING DATA TEMPORARILY UNAVAILABLE";
+    } finally {
+      window.clearTimeout(timeoutId);
+      activeRankingRequest = null;
+    }
+  })();
+
+  return activeRankingRequest;
+}
+
+function refreshAfterResume() {
+  if (document.hidden) return;
+
+  const now = Date.now();
+  if (now - lastRecoveryRefresh < RECOVERY_EVENT_DEBOUNCE_MS) return;
+
+  lastRecoveryRefresh = now;
+  loadRanking();
+}
+
+function reloadIfUpdatesStopped() {
+  if (!navigator.onLine) return;
+
+  const now = Date.now();
+  const updatesAreStale = now - lastSuccessfulFetch > STALE_SUCCESS_MS;
+  const reloadRecentlyAttempted = now - lastReloadAttempt < STALE_SUCCESS_MS;
+
+  if (!updatesAreStale || reloadRecentlyAttempted) return;
+
+  lastReloadAttempt = now;
+  window.location.reload();
 }
 
 loadRanking();
 window.setInterval(loadRanking, AUTO_REFRESH_MS);
+window.setInterval(reloadIfUpdatesStopped, WATCHDOG_INTERVAL_MS);
+
+document.addEventListener("visibilitychange", refreshAfterResume);
+window.addEventListener("pageshow", refreshAfterResume);
+window.addEventListener("focus", refreshAfterResume);
+window.addEventListener("online", refreshAfterResume);
