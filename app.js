@@ -91,7 +91,7 @@ function render(data) {
       score: Number(player.score) || 0,
     }))
     .sort((a, b) => a.rank - b.rank)
-    .slice(0, 10);
+    .slice(0, 11);
 
   const podium = document.querySelector("#podium");
   const rankingList = document.querySelector("#rankingList");

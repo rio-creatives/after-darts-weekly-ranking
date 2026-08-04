@@ -4,7 +4,11 @@
  * Ranking data, card order and the mobile layout are unchanged.
  */
 
-@media (min-width: 1100px) and (min-aspect-ratio: 8 / 5) {
+/*
+ * BrowseHere can report a 1920px TV as a 960px or 1024px CSS viewport.
+ * Start the TV layout at 800px so the fixed-height dashboard still applies.
+ */
+@media (min-width: 800px) and (min-aspect-ratio: 8 / 5) {
   html,
   body {
     height: 100%;
@@ -17,18 +21,18 @@
     width: 100vw;
     height: 100vh;
     min-height: 100vh;
-    padding: 2.2vh 4.2vw 1.8vh;
+    padding: 1.6vh 4.2vw 1.3vh;
   }
 
   .topbar {
-    min-height: 10.5vh;
-    padding-bottom: 1vh;
+    min-height: 8.5vh;
+    padding-bottom: 0.6vh;
   }
 
   .brand-logo-frame {
     left: 0;
     width: 14vw;
-    height: 9vh;
+    height: 7.5vh;
   }
 
   .dartslive-logo-frame {
@@ -47,20 +51,20 @@
   }
 
   .hero {
-    margin: 1.6vh auto 2.2vh;
+    margin: 1vh auto 1.4vh;
   }
 
   .eyebrow {
-    margin-bottom: 0.7vh;
+    margin-bottom: 0.45vh;
     font-size: 0.82vw;
   }
 
   h1 {
-    font-size: 3.65vw;
+    font-size: 3.45vw;
   }
 
   .week-range {
-    margin-top: 1.1vh;
+    margin-top: 0.7vh;
     font-size: 0.9vw;
   }
 
@@ -77,14 +81,14 @@
   }
 
   .podium-card {
-    min-height: 20vh;
-    padding: 1.4vw;
+    min-height: 18vh;
+    padding: 1.2vw;
     border-radius: 1vw;
   }
 
   .podium-card.first {
-    min-height: 23vh;
-    transform: translateY(-0.7vh);
+    min-height: 20vh;
+    transform: translateY(-0.45vh);
   }
 
   .podium-rank {
@@ -118,8 +122,8 @@
   .ranking-list {
     grid-auto-rows: minmax(0, 1fr);
     min-height: 0;
-    gap: 1vh 0.9vw;
-    margin-top: 1.8vh;
+    gap: 0.75vh 0.9vw;
+    margin-top: 1.2vh;
   }
 
   .ranking-row {
@@ -149,7 +153,7 @@
 
   .footer {
     width: 89vw;
-    margin-top: 1.5vh;
+    margin-top: 0.8vh;
     font-size: 0.68vw;
   }
 
