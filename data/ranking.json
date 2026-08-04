@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-05T01:35:52+08:00",
+  "updatedAt": "2026-08-05T01:49:32+08:00",
   "rankings": [
     {
       "rank": 1,
@@ -11,33 +11,33 @@
     },
     {
       "rank": 2,
+      "player": "RYO",
+      "score": 521
+    },
+    {
+      "rank": 3,
       "player": "Ryota",
       "score": 518
     },
     {
-      "rank": 3,
+      "rank": 4,
       "player": "YUTA",
       "score": 515
     },
     {
-      "rank": 4,
+      "rank": 5,
       "player": "AKO",
       "score": 484
     },
     {
-      "rank": 5,
+      "rank": 6,
       "player": "KEISUKE",
       "score": 471
     },
     {
-      "rank": 6,
+      "rank": 7,
       "player": "ROSE",
       "score": 465
-    },
-    {
-      "rank": 7,
-      "player": "RYO",
-      "score": 446
     },
     {
       "rank": 8,
