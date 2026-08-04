@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-05T02:16:28+08:00",
+  "updatedAt": "2026-08-05T04:47:13+08:00",
   "rankings": [
     {
       "rank": 1,
@@ -46,13 +46,13 @@
     },
     {
       "rank": 9,
-      "player": "Queen",
-      "score": 422
+      "player": "Akirose",
+      "score": 430
     },
     {
       "rank": 10,
-      "player": "Boricat ellen",
-      "score": 263
+      "player": "Queen",
+      "score": 422
     }
   ]
 }
