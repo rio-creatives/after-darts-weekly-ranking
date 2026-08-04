@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-05T00:07:02+08:00",
+  "lastSuccessfulCheckAt": "2026-08-05T00:27:07+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-05T00:07:02+08:00",
+      "updatedAt": "2026-08-05T00:27:07+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -93,18 +93,23 @@
         },
         {
           "rank": 7,
+          "player": "Prince",
+          "score": 433
+        },
+        {
+          "rank": 8,
           "player": "ROSE",
           "score": 427
         },
         {
-          "rank": 8,
+          "rank": 9,
           "player": "Queen",
           "score": 422
         },
         {
-          "rank": 9,
-          "player": "Prince",
-          "score": 275
+          "rank": 10,
+          "player": "Boricat ellen",
+          "score": 236
         }
       ]
     }
