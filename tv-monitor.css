@@ -20,8 +20,8 @@
     --tv-side-card-width: 1fr;
 
     /* Overall vertical allocation: top three / ranks 4-11. */
-    --tv-podium-area: 72fr;
-    --tv-ranking-list-area: 28fr;
+    --tv-podium-area: 56fr;
+    --tv-ranking-list-area: 44fr;
   }
 
   html,
