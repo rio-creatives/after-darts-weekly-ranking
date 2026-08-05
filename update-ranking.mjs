@@ -73,7 +73,7 @@ function parseRows(rows) {
 
   return players
     .sort((a, b) => a.rank - b.rank || b.score - a.score)
-    .slice(0, 10);
+    .slice(0, 11);
 }
 
 async function scrapeMonthlyRankingWithBrowser(url = SHOP_URL) {
