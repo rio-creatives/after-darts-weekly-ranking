@@ -149,7 +149,22 @@ function parseNationalRankingHtml(html) {
     }));
 }
 
-async function scrapeNationalMonthlyRanking() {
+function requireCompleteNationalRanking(players, method) {
+  // Use the national page only when it actually extends the shop page's top 10.
+  if (players.length < DISPLAY_RANKING_LIMIT) {
+    throw new Error(
+      `${method} contained only ${players.length} AFTER entries; ` +
+        `at least ${DISPLAY_RANKING_LIMIT} are required to extend the shop ranking.`,
+    );
+  }
+
+  console.log(
+    `${method} found ${players.length} AFTER monthly COUNT-UP entries.`,
+  );
+  return players;
+}
+
+async function scrapeNationalMonthlyRankingWithFetch() {
   const response = await fetch(NATIONAL_RANKING_URL, {
     headers: {
       Accept: "text/html",
@@ -165,20 +180,44 @@ async function scrapeNationalMonthlyRanking() {
   }
 
   const players = parseNationalRankingHtml(await response.text());
+  return requireCompleteNationalRanking(players, "National ranking fetch");
+}
 
-  // The national page is used only when it can actually extend the shop
-  // page's top 10. Otherwise the existing shop-page fallback stays authoritative.
-  if (players.length < DISPLAY_RANKING_LIMIT) {
-    throw new Error(
-      `National ranking contained only ${players.length} AFTER entries; ` +
-        `at least ${DISPLAY_RANKING_LIMIT} are required to extend the shop ranking.`,
-    );
+async function scrapeNationalMonthlyRankingWithBrowser() {
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--disable-dev-shm-usage", "--no-sandbox"],
+  });
+
+  try {
+    const context = await browser.newContext({
+      locale: "en-US",
+      timezoneId: "Asia/Manila",
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    });
+    const page = await context.newPage();
+    const response = await page.goto(NATIONAL_RANKING_URL, {
+      waitUntil: "domcontentloaded",
+      timeout: 60_000,
+    });
+
+    if (!response || response.status() >= 400) {
+      throw new Error(
+        `National DARTSLIVE browser request returned HTTP ` +
+          `${response?.status() ?? "unknown"}.`,
+      );
+    }
+
+    await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
+    await page.waitForTimeout(2_000);
+
+    const players = parseNationalRankingHtml(await page.content());
+    return requireCompleteNationalRanking(players, "National ranking browser");
+  } finally {
+    await browser.close();
   }
-
-  console.log(
-    `National ranking found ${players.length} AFTER monthly COUNT-UP entries.`,
-  );
-  return players;
 }
 
 async function scrapeMonthlyRankingWithBrowser(url = SHOP_URL) {
@@ -425,11 +464,21 @@ async function scrapeMonthlyRankingWithReader() {
 async function scrapeMonthlyRanking() {
   try {
     return {
-      rankings: await scrapeNationalMonthlyRanking(),
+      rankings: await scrapeNationalMonthlyRankingWithFetch(),
       source: NATIONAL_RANKING_URL,
     };
-  } catch (nationalError) {
-    console.warn(`National DARTSLIVE ranking failed: ${nationalError.message}`);
+  } catch (fetchError) {
+    console.warn(`National DARTSLIVE fetch failed: ${fetchError.message}`);
+  }
+
+  try {
+    console.log("Trying the national DARTSLIVE ranking with Chromium.");
+    return {
+      rankings: await scrapeNationalMonthlyRankingWithBrowser(),
+      source: NATIONAL_RANKING_URL,
+    };
+  } catch (browserError) {
+    console.warn(`National DARTSLIVE browser failed: ${browserError.message}`);
     console.log("Falling back to the AFTER shop ranking page.");
   }
 
@@ -487,15 +536,49 @@ function hasRankings(monthRanking) {
   return Array.isArray(monthRanking?.rankings) && monthRanking.rankings.length > 0;
 }
 
+function preserveCachedExtendedEntries(rankings, savedCurrentRanking) {
+  const savedRankings = Array.isArray(savedCurrentRanking?.rankings)
+    ? savedCurrentRanking.rankings
+    : [];
+
+  if (
+    rankings.length !== SHOP_PAGE_LIMIT ||
+    savedRankings.length <= rankings.length
+  ) {
+    return rankings;
+  }
+
+  const currentPlayers = new Set(rankings.map((entry) => entry.player));
+  const cachedTail = savedRankings
+    .slice(SHOP_PAGE_LIMIT)
+    .filter((entry) => !currentPlayers.has(entry.player));
+
+  if (cachedTail.length === 0) return rankings;
+
+  const preserved = [...rankings, ...cachedTail]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, DISPLAY_RANKING_LIMIT)
+    .map((entry, index) => ({ ...entry, rank: index + 1 }));
+
+  console.log(
+    `The shop page returned only ${rankings.length} entries; ` +
+      `preserving ${preserved.length - rankings.length} cached lower entry.`,
+  );
+  return preserved;
+}
+
 async function main() {
   const now = new Date();
   const updatedAt = toPhtIso(now);
   const month = getMonth(now);
-  const { rankings, source } = await scrapeMonthlyRanking();
+  const fetched = await scrapeMonthlyRanking();
+  let rankings = fetched.rankings;
+  const { source } = fetched;
   const history = await readHistory();
 
   history.months ??= {};
   const savedCurrentRanking = history.months[month.key];
+  rankings = preserveCachedExtendedEntries(rankings, savedCurrentRanking);
   const fetchedCurrentRanking = {
     periodStart: toPhtIso(month.start),
     periodEnd: toPhtIso(month.end),
