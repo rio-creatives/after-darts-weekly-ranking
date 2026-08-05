@@ -1,16 +1,20 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 
+const SHOP_ID = "5c142ac9a5d39ea9fec1ae84bb28bd87";
+const NATIONAL_RANKING_URL = "https://www.dartslive.com/ph/ranking/";
 const SHOP_URL =
-  "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data";
+  `https://search.dartslive.com/ph/shop/${SHOP_ID}/data`;
 const TRANSLATE_PROXY_URL =
   "https://search-dartslive-com.translate.goog/ph/shop/" +
-  "5c142ac9a5d39ea9fec1ae84bb28bd87/data" +
+  `${SHOP_ID}/data` +
   "?_x_tr_sl=en&_x_tr_tl=fil&_x_tr_hl=en";
 const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
 const PHT_OFFSET_MS = 8 * 60 * 60 * 1000;
 const MAX_HISTORY_MONTHS = 12;
+const DISPLAY_RANKING_LIMIT = 11;
+const SHOP_PAGE_LIMIT = 10;
 
 function pad(number) {
   return String(number).padStart(2, "0");
@@ -73,7 +77,108 @@ function parseRows(rows) {
 
   return players
     .sort((a, b) => a.rank - b.rank || b.score - a.score)
-    .slice(0, 11);
+    .slice(0, SHOP_PAGE_LIMIT);
+}
+
+function getClassText(markup, className) {
+  const pattern = new RegExp(
+    `<[^>]+class=["'][^"']*\\b${className}\\b[^"']*["'][^>]*>` +
+      `([\\s\\S]*?)<\\/[^>]+>`,
+    "i",
+  );
+  const match = markup.match(pattern);
+  return match ? stripHtml(match[1]) : "";
+}
+
+function parseNationalRankingHtml(html) {
+  const countUpStart = html.search(
+    /<div\b(?=[^>]*\bdata-id=["']count-up["'])(?=[^>]*\bclass=["'][^"']*\bposts\b[^"']*["'])[^>]*>/i,
+  );
+  if (countUpStart < 0) {
+    throw new Error("National ranking did not contain the COUNT-UP section.");
+  }
+
+  const afterCountUpStart = html.slice(countUpStart);
+  const nextCategoryOffset = afterCountUpStart.search(
+    /<div\b(?=[^>]*\bdata-id=["'](?:shoot_out|rating|rating2)["'])(?=[^>]*\bclass=["'][^"']*\bposts\b[^"']*["'])[^>]*>/i,
+  );
+  const countUpHtml =
+    nextCategoryOffset >= 0
+      ? afterCountUpStart.slice(0, nextCategoryOffset)
+      : afterCountUpStart;
+  const currentMonthMatch = countUpHtml.match(
+    /<dl\b(?=[^>]*\bclass=["'][^"']*\branking-month\b[^"']*\bthis_month\b[^"']*["'])[^>]*>([\s\S]*?)<\/dl>/i,
+  );
+
+  if (!currentMonthMatch) {
+    throw new Error("National ranking did not contain this month's COUNT-UP list.");
+  }
+
+  const rows = [...currentMonthMatch[1].matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)];
+  if (rows.length === 0) {
+    throw new Error("National ranking's current-month COUNT-UP list was empty.");
+  }
+
+  const players = [];
+  for (const row of rows) {
+    const markup = row[1];
+    const shopMarkup = markup.match(
+      /<p\b[^>]*class=["'][^"']*\bshop\b[^"']*["'][^>]*>([\s\S]*?)<\/p>/i,
+    )?.[1];
+    const shopUrl = shopMarkup?.match(/<a\b[^>]*href=["']([^"']+)["']/i)?.[1] || "";
+    const player = correctPlayerName(getClassText(markup, "name"));
+    const score = Number(getClassText(markup, "price").replace(/[^\d]/g, ""));
+
+    if (
+      shopUrl.includes(`/shop/${SHOP_ID}`) &&
+      player &&
+      Number.isInteger(score) &&
+      score > 0 &&
+      score <= 2000
+    ) {
+      players.push({ player, score });
+    }
+  }
+
+  return players
+    .sort((a, b) => b.score - a.score)
+    .slice(0, DISPLAY_RANKING_LIMIT)
+    .map((entry, index) => ({
+      rank: index + 1,
+      ...entry,
+    }));
+}
+
+async function scrapeNationalMonthlyRanking() {
+  const response = await fetch(NATIONAL_RANKING_URL, {
+    headers: {
+      Accept: "text/html",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    },
+    signal: AbortSignal.timeout(60_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`National DARTSLIVE ranking returned HTTP ${response.status}.`);
+  }
+
+  const players = parseNationalRankingHtml(await response.text());
+
+  // The national page is used only when it can actually extend the shop
+  // page's top 10. Otherwise the existing shop-page fallback stays authoritative.
+  if (players.length < DISPLAY_RANKING_LIMIT) {
+    throw new Error(
+      `National ranking contained only ${players.length} AFTER entries; ` +
+        `at least ${DISPLAY_RANKING_LIMIT} are required to extend the shop ranking.`,
+    );
+  }
+
+  console.log(
+    `National ranking found ${players.length} AFTER monthly COUNT-UP entries.`,
+  );
+  return players;
 }
 
 async function scrapeMonthlyRankingWithBrowser(url = SHOP_URL) {
@@ -298,7 +403,7 @@ async function scrapeMonthlyRankingWithProxy() {
 async function scrapeMonthlyRankingWithReader() {
   const readerUrl =
     "https://r.jina.ai/https://search.dartslive.com/ph/shop/" +
-    "5c142ac9a5d39ea9fec1ae84bb28bd87/data";
+    `${SHOP_ID}/data`;
   const response = await fetch(readerUrl, {
     headers: {
       Accept: "text/plain",
@@ -319,20 +424,39 @@ async function scrapeMonthlyRankingWithReader() {
 
 async function scrapeMonthlyRanking() {
   try {
-    return await scrapeMonthlyRankingWithBrowser();
+    return {
+      rankings: await scrapeNationalMonthlyRanking(),
+      source: NATIONAL_RANKING_URL,
+    };
+  } catch (nationalError) {
+    console.warn(`National DARTSLIVE ranking failed: ${nationalError.message}`);
+    console.log("Falling back to the AFTER shop ranking page.");
+  }
+
+  try {
+    return {
+      rankings: await scrapeMonthlyRankingWithBrowser(),
+      source: SHOP_URL,
+    };
   } catch (browserError) {
     console.warn(`Direct DARTSLIVE access failed: ${browserError.message}`);
   }
 
   try {
     console.log("Trying the DARTSLIVE proxy fallback.");
-    return await scrapeMonthlyRankingWithProxy();
+    return {
+      rankings: await scrapeMonthlyRankingWithProxy(),
+      source: SHOP_URL,
+    };
   } catch (proxyError) {
     console.warn(`DARTSLIVE proxy access failed: ${proxyError.message}`);
   }
 
   console.log("Trying the original-text reader fallback.");
-  return scrapeMonthlyRankingWithReader();
+  return {
+    rankings: await scrapeMonthlyRankingWithReader(),
+    source: SHOP_URL,
+  };
 }
 
 async function readHistory() {
@@ -367,7 +491,7 @@ async function main() {
   const now = new Date();
   const updatedAt = toPhtIso(now);
   const month = getMonth(now);
-  const rankings = await scrapeMonthlyRanking();
+  const { rankings, source } = await scrapeMonthlyRanking();
   const history = await readHistory();
 
   history.months ??= {};
@@ -391,7 +515,7 @@ async function main() {
     retainedKeys.map((key) => [key, history.months[key]]),
   );
   history.lastSuccessfulCheckAt = updatedAt;
-  history.source = SHOP_URL;
+  history.source = source;
 
   const previousRanking = getLatestPreviousRanking(history, month.key);
   const displayedRanking =
@@ -406,6 +530,7 @@ async function main() {
     periodStart: displayedRanking.periodStart,
     periodEnd: displayedRanking.periodEnd,
     updatedAt,
+    source,
     rankings: displayedRanking.rankings,
   };
 
