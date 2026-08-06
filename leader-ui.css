@@ -12,7 +12,7 @@
 .podium-card.first::before {
   transform-origin: 50% 50%;
   animation: leader-darts-float 4.2s ease-in-out infinite;
-  top: calc(50% - 4px);
+  top: calc(50% - 8px);
 }
 
 .leader-badge {
@@ -145,7 +145,7 @@
 .leader-challenge {
   color: #fff1c8;
   text-shadow: 0 0 14px rgba(255, 214, 104, 0.26);
-  transform: translate(3px, 0);
+  transform: translate(6px, 0);
 }
 
 .leader-gap {
@@ -344,7 +344,7 @@
 
   .leader-reward-row {
     right: 16px;
-    bottom: 43px;
+    bottom: 39px;
     left: 16px;
     width: auto;
     gap: 5px;
