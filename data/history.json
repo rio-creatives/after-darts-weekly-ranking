@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-06T19:37:35+08:00",
+  "lastSuccessfulCheckAt": "2026-08-06T21:24:45+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-06T19:37:35+08:00",
+      "updatedAt": "2026-08-06T21:24:45+08:00",
       "rankings": [
         {
           "rank": 1,
