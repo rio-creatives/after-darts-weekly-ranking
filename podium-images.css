@@ -70,9 +70,9 @@
 
   /* 1位：ゴールド */
   .podium-card.first::before {
-    width: clamp(132px, 38vw, 176px);
+    width: clamp(145px, 42vw, 190px);
     right: -8px;
-    top: 50%;
+    top: 35%;
   }
 
   /* 2位：シルバー */
