@@ -104,6 +104,12 @@
   height: clamp(14px, 1vw, 19px);
   margin-right: clamp(5px, 0.4vw, 8px);
   line-height: 1;
+  transform: translateY(-1px);
+}
+
+.leader-reward-text {
+  display: inline-block;
+  transform: translateY(1px);
 }
 
 .leader-reward-icon svg {
