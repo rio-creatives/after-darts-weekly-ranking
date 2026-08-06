@@ -94,6 +94,7 @@
     `;
 
     const rewardText = document.createElement("span");
+    rewardText.className = "leader-reward-text";
     rewardText.textContent = "MONTHLY REWARD WITHIN REACH";
 
     const countdown = document.createElement("span");
