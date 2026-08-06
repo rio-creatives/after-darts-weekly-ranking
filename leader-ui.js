@@ -83,7 +83,15 @@
     const rewardIcon = document.createElement("span");
     rewardIcon.className = "leader-reward-icon";
     rewardIcon.setAttribute("aria-hidden", "true");
-    rewardIcon.textContent = "🎁";
+    rewardIcon.innerHTML = `
+      <svg viewBox="0 0 24 24" focusable="false">
+        <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+        <path d="M12 8v13"></path>
+        <path d="M19 12v9H5v-9"></path>
+        <path d="M12 8H7.5a2.5 2.5 0 1 1 2.45-3C10.3 6.4 12 8 12 8Z"></path>
+        <path d="M12 8h4.5a2.5 2.5 0 1 0-2.45-3C13.7 6.4 12 8 12 8Z"></path>
+      </svg>
+    `;
 
     const rewardText = document.createElement("span");
     rewardText.textContent = "MONTHLY REWARD WITHIN REACH";

@@ -42,12 +42,13 @@
   z-index: 5 !important;
   bottom: clamp(11px, 0.85vw, 16px);
   left: clamp(16px, 1.7vw, 28px);
+  right: clamp(16px, 1.7vw, 28px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 61%;
+  width: auto;
   gap: 10px;
-  font-size: clamp(9px, 0.62vw, 12px);
+  font-size: clamp(9px, 0.68vw, 13px);
   font-weight: 900;
   letter-spacing: 0.12em;
   line-height: 1;
@@ -59,12 +60,14 @@
   z-index: 5 !important;
   bottom: clamp(38px, 3.15vw, 54px);
   left: clamp(16px, 1.7vw, 28px);
+  right: clamp(16px, 1.7vw, 28px);
   display: flex;
   align-items: center;
-  width: 65%;
-  gap: clamp(4px, 0.38vw, 7px);
+  justify-content: space-between;
+  width: auto;
+  gap: clamp(8px, 0.65vw, 13px);
   color: #ffe6a3;
-  font-size: clamp(7px, 0.53vw, 10px);
+  font-size: clamp(9px, 0.68vw, 13px);
   font-weight: 900;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -84,18 +87,33 @@
 }
 
 .leader-reward-badge {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   justify-content: center;
-  padding: clamp(4px, 0.3vw, 6px) clamp(6px, 0.48vw, 9px);
+  padding: clamp(6px, 0.48vw, 9px) clamp(10px, 0.78vw, 15px);
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .leader-reward-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  margin-right: clamp(3px, 0.25vw, 5px);
-  font-size: 1.08em;
+  width: clamp(14px, 1vw, 19px);
+  height: clamp(14px, 1vw, 19px);
+  margin-right: clamp(5px, 0.4vw, 8px);
   line-height: 1;
+}
+
+.leader-reward-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .leader-countdown {
@@ -109,6 +127,8 @@
   background: none;
   box-shadow: none;
   color: #ffffff;
+  font-size: 0.9em;
+  letter-spacing: 0.11em;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.16);
 }
 
@@ -255,7 +275,7 @@
 @media (min-width: 800px) and (min-aspect-ratio: 8 / 5) {
   .podium-card.first {
     padding-top: clamp(13px, 2.8vh, 30px);
-    padding-bottom: clamp(28px, 5.6vh, 54px);
+    padding-bottom: clamp(38px, 8.2vh, 62px);
   }
 
   .leader-badge {
@@ -267,21 +287,23 @@
   .leader-footer {
     bottom: 1.05vh;
     left: 1.4vw;
-    gap: 0.55vw;
-    width: 65%;
-    font-size: clamp(7px, 0.58vw, 11px);
+    right: 1.4vw;
+    gap: 0.8vw;
+    width: auto;
+    font-size: clamp(8px, 0.68vw, 12px);
   }
 
   .leader-reward-row {
     bottom: 4.25vh;
     left: 1.4vw;
-    width: 65%;
-    gap: 0.35vw;
-    font-size: clamp(6.5px, 0.53vw, 10px);
+    right: 1.4vw;
+    width: auto;
+    gap: 0.7vw;
+    font-size: clamp(8px, 0.68vw, 12px);
   }
 
   .leader-reward-badge {
-    padding: 0.34vh 0.48vw;
+    padding: 0.9vh 0.85vw;
   }
 
   .leader-gap {
@@ -305,6 +327,7 @@
     bottom: 13px;
     left: 16px;
     width: auto;
+    font-size: clamp(8px, 2.5vw, 11px);
   }
 
   .leader-reward-row {
@@ -313,11 +336,11 @@
     left: 16px;
     width: auto;
     gap: 5px;
-    font-size: clamp(7px, 2.15vw, 9px);
+    font-size: clamp(8px, 2.35vw, 10px);
   }
 
   .leader-reward-badge {
-    padding: 5px 7px;
+    padding: 7px 9px;
   }
 
   .leader-countdown {
