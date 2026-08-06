@@ -127,7 +127,9 @@
   background: none;
   box-shadow: none;
   color: #ffffff;
-  font-size: 0.9em;
+  font-size: 1em;
+    /* 位置の微調整を追加 */
+  transform: translate(0, 3px);
   letter-spacing: 0.11em;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.16);
 }
@@ -300,6 +302,7 @@
     width: auto;
     gap: 0.7vw;
     font-size: clamp(8px, 0.68vw, 12px);
+    transform: translateY(2px);
   }
 
   .leader-reward-badge {
