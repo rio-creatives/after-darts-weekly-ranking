@@ -205,6 +205,11 @@
 }
 
 
+/* Temporarily hide remaining days */
+.leader-countdown {
+  display: none;
+}
+
 
 @keyframes reward-ready-glow {
   0%,
