@@ -400,6 +400,10 @@
   .leader-reward-badge {
     padding: 7px 9px;
   }
+  
+  .leader-reward-icon {
+    font-size: 13px;
+  }
 
   .leader-countdown {
     padding: 0;
