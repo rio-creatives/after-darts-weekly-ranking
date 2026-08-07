@@ -72,7 +72,7 @@
   .podium-card.first::before {
     width: clamp(145px, 42vw, 190px);
     right: -8px;
-    top: 35%;
+    top: 15%;
   }
 
   /* 2位：シルバー */
