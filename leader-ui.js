@@ -32,6 +32,7 @@
 
     return {
       deadlineLabel,
+      showCountdown: daysLeft <= 7,
       countdownLabel:
         daysLeft === 0
           ? "FINAL DAY"
@@ -110,7 +111,10 @@
     sheen.setAttribute("aria-hidden", "true");
 
     rewardBadge.append(rewardIcon, rewardText);
-    rewardRow.append(rewardBadge, countdown);
+    rewardRow.append(rewardBadge);
+    if (monthStatus.showCountdown) {
+      rewardRow.append(countdown);
+    }
     footer.append(challenge, gap);
     leader.prepend(spotlight, sheen, badge);
     leader.append(rewardRow, footer);
@@ -118,10 +122,17 @@
 
     const playerName =
       leader.querySelector(".player-name")?.textContent?.trim() || "Current leader";
-    leader.setAttribute(
-      "aria-label",
-      `${playerName}, current leader, ${leaderScore.toLocaleString("en-US")} points, monthly reward within reach, ${monthStatus.countdownLabel.toLowerCase()}, stay number one through ${monthStatus.deadlineLabel}, ${leadMessage.toLowerCase()}`,
-    );
+    const accessibilityLabel = [
+      `${playerName}, current leader`,
+      `${leaderScore.toLocaleString("en-US")} points`,
+      "monthly reward within reach",
+      ...(monthStatus.showCountdown
+        ? [monthStatus.countdownLabel.toLowerCase()]
+        : []),
+      `stay number one through ${monthStatus.deadlineLabel}`,
+      leadMessage.toLowerCase(),
+    ].join(", ");
+    leader.setAttribute("aria-label", accessibilityLabel);
   }
 
   const observer = new MutationObserver(enhanceLeaderCard);
