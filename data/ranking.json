@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-06T21:24:45+08:00",
+  "updatedAt": "2026-08-07T10:09:48+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "rankings": [
     {
@@ -17,23 +17,23 @@
     },
     {
       "rank": 3,
+      "player": "KEISUKE",
+      "score": 571
+    },
+    {
+      "rank": 4,
       "player": "RYO",
       "score": 521
     },
     {
-      "rank": 4,
+      "rank": 5,
       "player": "YUTA",
       "score": 515
     },
     {
-      "rank": 5,
+      "rank": 6,
       "player": "AKO",
       "score": 484
-    },
-    {
-      "rank": 6,
-      "player": "KEISUKE",
-      "score": 471
     },
     {
       "rank": 7,
