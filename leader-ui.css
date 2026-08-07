@@ -331,7 +331,7 @@
   }
 
   .podium-card.first::before {
-    top: calc(50% - 12px);
+    top: calc(50% - 16px);
   }
 
   .leader-badge {
