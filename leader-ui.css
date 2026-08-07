@@ -330,6 +330,10 @@
     padding-bottom: 76px;
   }
 
+  .podium-card.first::before {
+    top: calc(50% - 24px);
+  }
+
   .leader-badge {
     top: 13px;
   }
