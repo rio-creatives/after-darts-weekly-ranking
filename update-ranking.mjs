@@ -3,6 +3,9 @@ import { chromium } from "playwright";
 
 const SHOP_ID = "5c142ac9a5d39ea9fec1ae84bb28bd87";
 const NATIONAL_RANKING_URL = "https://www.dartslive.com/ph/ranking/";
+const NATIONAL_TRANSLATE_PROXY_URL =
+  "https://www-dartslive-com.translate.goog/ph/ranking/" +
+  "?_x_tr_sl=en&_x_tr_tl=fil&_x_tr_hl=en";
 const SHOP_URL =
   `https://search.dartslive.com/ph/shop/${SHOP_ID}/data`;
 const TRANSLATE_PROXY_URL =
@@ -181,6 +184,27 @@ async function scrapeNationalMonthlyRankingWithFetch() {
 
   const players = parseNationalRankingHtml(await response.text());
   return requireCompleteNationalRanking(players, "National ranking fetch");
+}
+
+async function scrapeNationalMonthlyRankingWithProxy() {
+  const response = await fetch(NATIONAL_TRANSLATE_PROXY_URL, {
+    headers: {
+      Accept: "text/html",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    },
+    signal: AbortSignal.timeout(60_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `National DARTSLIVE proxy returned HTTP ${response.status}.`,
+    );
+  }
+
+  const players = parseNationalRankingHtml(await response.text());
+  return requireCompleteNationalRanking(players, "National ranking proxy");
 }
 
 async function scrapeNationalMonthlyRankingWithBrowser() {
@@ -472,6 +496,16 @@ async function scrapeMonthlyRanking() {
   }
 
   try {
+    console.log("Trying the national DARTSLIVE ranking through the proxy.");
+    return {
+      rankings: await scrapeNationalMonthlyRankingWithProxy(),
+      source: NATIONAL_RANKING_URL,
+    };
+  } catch (proxyError) {
+    console.warn(`National DARTSLIVE proxy failed: ${proxyError.message}`);
+  }
+
+  try {
     console.log("Trying the national DARTSLIVE ranking with Chromium.");
     return {
       rankings: await scrapeNationalMonthlyRankingWithBrowser(),
@@ -536,37 +570,6 @@ function hasRankings(monthRanking) {
   return Array.isArray(monthRanking?.rankings) && monthRanking.rankings.length > 0;
 }
 
-function preserveCachedExtendedEntries(rankings, savedCurrentRanking) {
-  const savedRankings = Array.isArray(savedCurrentRanking?.rankings)
-    ? savedCurrentRanking.rankings
-    : [];
-
-  if (
-    rankings.length !== SHOP_PAGE_LIMIT ||
-    savedRankings.length <= rankings.length
-  ) {
-    return rankings;
-  }
-
-  const currentPlayers = new Set(rankings.map((entry) => entry.player));
-  const cachedTail = savedRankings
-    .slice(SHOP_PAGE_LIMIT)
-    .filter((entry) => !currentPlayers.has(entry.player));
-
-  if (cachedTail.length === 0) return rankings;
-
-  const preserved = [...rankings, ...cachedTail]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, DISPLAY_RANKING_LIMIT)
-    .map((entry, index) => ({ ...entry, rank: index + 1 }));
-
-  console.log(
-    `The shop page returned only ${rankings.length} entries; ` +
-      `preserving ${preserved.length - rankings.length} cached lower entry.`,
-  );
-  return preserved;
-}
-
 async function main() {
   const now = new Date();
   const updatedAt = toPhtIso(now);
@@ -578,7 +581,6 @@ async function main() {
 
   history.months ??= {};
   const savedCurrentRanking = history.months[month.key];
-  rankings = preserveCachedExtendedEntries(rankings, savedCurrentRanking);
   const fetchedCurrentRanking = {
     periodStart: toPhtIso(month.start),
     periodEnd: toPhtIso(month.end),
