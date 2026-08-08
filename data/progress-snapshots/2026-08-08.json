@@ -1,0 +1,64 @@
+{
+  "snapshotDate": "2026-08-08",
+  "month": "2026-08",
+  "stage": "first_week",
+  "daysRemaining": 23,
+  "dataUpdatedAt": "2026-08-08T15:33:29+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "Rei",
+      "score": 637
+    },
+    {
+      "rank": 2,
+      "player": "Ryota",
+      "score": 595
+    },
+    {
+      "rank": 3,
+      "player": "KEISUKE",
+      "score": 571
+    },
+    {
+      "rank": 4,
+      "player": "RYO",
+      "score": 521
+    },
+    {
+      "rank": 5,
+      "player": "YUTA",
+      "score": 515
+    },
+    {
+      "rank": 6,
+      "player": "AKO",
+      "score": 484
+    },
+    {
+      "rank": 7,
+      "player": "ROSE",
+      "score": 465
+    },
+    {
+      "rank": 8,
+      "player": "TRYO",
+      "score": 457
+    },
+    {
+      "rank": 9,
+      "player": "Rj45",
+      "score": 435
+    },
+    {
+      "rank": 10,
+      "player": "Prince",
+      "score": 433
+    },
+    {
+      "rank": 11,
+      "player": "Boricat ellen",
+      "score": 381
+    }
+  ]
+}
