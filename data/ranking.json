@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-09T19:51:28+08:00",
+  "updatedAt": "2026-08-09T21:35:14+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "rankings": [
     {
@@ -37,61 +37,66 @@
     },
     {
       "rank": 7,
+      "player": "MARUFUJI",
+      "score": 466
+    },
+    {
+      "rank": 8,
       "player": "ROSE",
       "score": 465
     },
     {
-      "rank": 8,
+      "rank": 9,
       "player": "TRYO",
       "score": 457
     },
     {
-      "rank": 9,
+      "rank": 10,
+      "player": "Queen",
+      "score": 437
+    },
+    {
+      "rank": 11,
       "player": "Rj45",
       "score": 435
     },
     {
-      "rank": 10,
+      "rank": 12,
       "player": "Prince",
       "score": 433
     },
     {
-      "rank": 11,
+      "rank": 13,
       "player": "Akirose",
       "score": 430
     },
     {
-      "rank": 12,
-      "player": "Queen",
-      "score": 422
-    },
-    {
-      "rank": 13,
+      "rank": 14,
       "player": "Boricat ellen",
       "score": 381
     },
     {
-      "rank": 14,
+      "rank": 15,
       "player": "Peter",
       "score": 358
     },
     {
-      "rank": 15,
+      "rank": 16,
       "player": "NAOMI",
       "score": 353
     },
     {
-      "rank": 16,
+      "rank": 17,
       "player": "Shiboli",
       "score": 352
     },
     {
-      "rank": 17,
+      "rank": 18,
       "player": "Krstnlv",
       "score": 347
     },
     {
-      "rank": 18,
+      "rank": 19,
       "player": "Kath24",
       "score": 252
     }
