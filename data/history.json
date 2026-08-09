@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-10T00:17:19+08:00",
+  "lastSuccessfulCheckAt": "2026-08-10T01:43:36+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "months": {
     "2026-07": {
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-10T00:17:19+08:00",
+      "updatedAt": "2026-08-10T01:43:36+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -99,7 +99,7 @@
         {
           "rank": 8,
           "player": "ROSE",
-          "score": 465
+          "score": 471
         },
         {
           "rank": 9,
@@ -128,33 +128,33 @@
         },
         {
           "rank": 14,
+          "player": "Maechan",
+          "score": 417
+        },
+        {
+          "rank": 15,
           "player": "Boricat ellen",
           "score": 381
         },
         {
-          "rank": 15,
+          "rank": 16,
           "player": "Peter",
           "score": 358
         },
         {
-          "rank": 16,
+          "rank": 17,
           "player": "NAOMI",
           "score": 353
         },
         {
-          "rank": 17,
+          "rank": 18,
           "player": "Shiboli",
           "score": 352
         },
         {
-          "rank": 18,
+          "rank": 19,
           "player": "Krstnlv",
           "score": 347
-        },
-        {
-          "rank": 19,
-          "player": "Maechan",
-          "score": 307
         },
         {
           "rank": 20,
