@@ -3,6 +3,15 @@
  * Loaded after the existing theme and TV styles so ranking logic stays untouched.
  */
 
+/* PC and TV keep the existing top-11 layout.
+ * The list starts at rank 4, so its first eight rows are ranks 4 through 11.
+ */
+@media (min-width: 721px) {
+  #rankingList .ranking-row:nth-child(n + 9) {
+    display: none;
+  }
+}
+
 .podium-card.first {
   isolation: isolate;
   padding-top: clamp(44px, 3vw, 58px);

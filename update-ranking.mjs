@@ -16,7 +16,7 @@ const HISTORY_FILE = "data/history.json";
 const RANKING_FILE = "data/ranking.json";
 const PHT_OFFSET_MS = 8 * 60 * 60 * 1000;
 const MAX_HISTORY_MONTHS = 12;
-const DISPLAY_RANKING_LIMIT = 11;
+const MIN_NATIONAL_RANKING_ENTRIES = 11;
 const SHOP_PAGE_LIMIT = 10;
 
 function pad(number) {
@@ -145,7 +145,6 @@ function parseNationalRankingHtml(html) {
 
   return players
     .sort((a, b) => b.score - a.score)
-    .slice(0, DISPLAY_RANKING_LIMIT)
     .map((entry, index) => ({
       rank: index + 1,
       ...entry,
@@ -154,10 +153,10 @@ function parseNationalRankingHtml(html) {
 
 function requireCompleteNationalRanking(players, method) {
   // Use the national page only when it actually extends the shop page's top 10.
-  if (players.length < DISPLAY_RANKING_LIMIT) {
+  if (players.length < MIN_NATIONAL_RANKING_ENTRIES) {
     throw new Error(
       `${method} contained only ${players.length} AFTER entries; ` +
-        `at least ${DISPLAY_RANKING_LIMIT} are required to extend the shop ranking.`,
+        `at least ${MIN_NATIONAL_RANKING_ENTRIES} are required to extend the shop ranking.`,
     );
   }
 
