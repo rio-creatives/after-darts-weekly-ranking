@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-10T23:12:47+08:00",
+  "updatedAt": "2026-08-11T00:13:20+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "rankings": [
     {
@@ -87,21 +87,26 @@
     },
     {
       "rank": 17,
-      "player": "NAOMI",
+      "player": "Wakkanai!",
       "score": 353
     },
     {
       "rank": 18,
+      "player": "NAOMI",
+      "score": 353
+    },
+    {
+      "rank": 19,
       "player": "Shiboli",
       "score": 352
     },
     {
-      "rank": 19,
+      "rank": 20,
       "player": "Krstnlv",
       "score": 347
     },
     {
-      "rank": 20,
+      "rank": 21,
       "player": "Kath24",
       "score": 252
     }
