@@ -5,11 +5,14 @@ const FETCH_TIMEOUT_MS = 20 * 1000;
 const STALE_SUCCESS_MS = 12 * 60 * 1000;
 const WATCHDOG_INTERVAL_MS = 60 * 1000;
 const RECOVERY_EVENT_DEBOUNCE_MS = 2 * 1000;
+const DESKTOP_RANKING_LIMIT = 11;
+const MOBILE_RANKING_QUERY = window.matchMedia("(max-width: 720px)");
 
 let lastSuccessfulFetch = Date.now();
 let lastReloadAttempt = 0;
 let lastRecoveryRefresh = 0;
 let activeRankingRequest = null;
+let latestRankingData = null;
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "Asia/Manila",
@@ -83,14 +86,19 @@ function renderListEntry(player) {
 }
 
 function render(data) {
+  latestRankingData = data;
+
   const rankings = Array.isArray(data.rankings) ? data.rankings : [];
-  const sorted = rankings
+  const allSorted = rankings
     .map((player, index) => ({
       ...player,
       rank: Number(player.rank) || index + 1,
       score: Number(player.score) || 0,
     }))
     .sort((a, b) => a.rank - b.rank);
+  const sorted = MOBILE_RANKING_QUERY.matches
+    ? allSorted
+    : allSorted.slice(0, DESKTOP_RANKING_LIMIT);
 
   const podium = document.querySelector("#podium");
   const rankingList = document.querySelector("#rankingList");
@@ -177,6 +185,10 @@ function refreshAfterResume() {
   loadRanking();
 }
 
+function rerenderForViewport() {
+  if (latestRankingData) render(latestRankingData);
+}
+
 function reloadIfUpdatesStopped() {
   if (!navigator.onLine) return;
 
@@ -198,3 +210,9 @@ document.addEventListener("visibilitychange", refreshAfterResume);
 window.addEventListener("pageshow", refreshAfterResume);
 window.addEventListener("focus", refreshAfterResume);
 window.addEventListener("online", refreshAfterResume);
+
+if (typeof MOBILE_RANKING_QUERY.addEventListener === "function") {
+  MOBILE_RANKING_QUERY.addEventListener("change", rerenderForViewport);
+} else {
+  MOBILE_RANKING_QUERY.addListener(rerenderForViewport);
+}
