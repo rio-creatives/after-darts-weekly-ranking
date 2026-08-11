@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-11T23:45:13+08:00",
+  "updatedAt": "2026-08-12T00:42:30+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "rankings": [
     {
@@ -72,46 +72,56 @@
     },
     {
       "rank": 14,
+      "player": "The Boss",
+      "score": 422
+    },
+    {
+      "rank": 15,
       "player": "Maechan",
       "score": 417
     },
     {
-      "rank": 15,
+      "rank": 16,
       "player": "Boricat ellen",
       "score": 381
     },
     {
-      "rank": 16,
+      "rank": 17,
       "player": "Peter",
       "score": 358
     },
     {
-      "rank": 17,
+      "rank": 18,
       "player": "Wakkanai!",
       "score": 353
     },
     {
-      "rank": 18,
+      "rank": 19,
       "player": "NAOMI",
       "score": 353
     },
     {
-      "rank": 19,
+      "rank": 20,
       "player": "Shiboli",
       "score": 352
     },
     {
-      "rank": 20,
+      "rank": 21,
       "player": "Krstnlv",
       "score": 347
     },
     {
-      "rank": 21,
+      "rank": 22,
+      "player": "AOTO",
+      "score": 339
+    },
+    {
+      "rank": 23,
       "player": "Lara psai",
       "score": 307
     },
     {
-      "rank": 22,
+      "rank": 24,
       "player": "Kath24",
       "score": 252
     }
