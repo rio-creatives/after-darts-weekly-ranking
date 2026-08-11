@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-12T01:45:32+08:00",
+  "lastSuccessfulCheckAt": "2026-08-12T03:51:09+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "months": {
     "2026-07": {
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-12T01:45:32+08:00",
+      "updatedAt": "2026-08-12T03:51:09+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -78,98 +78,98 @@
         },
         {
           "rank": 4,
+          "player": "The Boss",
+          "score": 526
+        },
+        {
+          "rank": 5,
           "player": "RYO",
           "score": 521
         },
         {
-          "rank": 5,
+          "rank": 6,
           "player": "YUTA",
           "score": 515
         },
         {
-          "rank": 6,
+          "rank": 7,
           "player": "AKO",
           "score": 484
         },
         {
-          "rank": 7,
+          "rank": 8,
           "player": "MARUFUJI",
           "score": 481
         },
         {
-          "rank": 8,
+          "rank": 9,
           "player": "ROSE",
           "score": 471
         },
         {
-          "rank": 9,
+          "rank": 10,
           "player": "TRYO",
           "score": 457
         },
         {
-          "rank": 10,
+          "rank": 11,
           "player": "Queen",
           "score": 437
         },
         {
-          "rank": 11,
+          "rank": 12,
           "player": "Rj45",
           "score": 435
         },
         {
-          "rank": 12,
+          "rank": 13,
+          "player": "AOTO",
+          "score": 434
+        },
+        {
+          "rank": 14,
           "player": "Prince",
           "score": 433
         },
         {
-          "rank": 13,
+          "rank": 15,
           "player": "Akirose",
           "score": 430
         },
         {
-          "rank": 14,
-          "player": "The Boss",
-          "score": 422
-        },
-        {
-          "rank": 15,
+          "rank": 16,
           "player": "Maechan",
           "score": 417
         },
         {
-          "rank": 16,
+          "rank": 17,
           "player": "Boricat ellen",
           "score": 381
         },
         {
-          "rank": 17,
+          "rank": 18,
           "player": "Peter",
           "score": 358
         },
         {
-          "rank": 18,
+          "rank": 19,
           "player": "Wakkanai!",
           "score": 353
         },
         {
-          "rank": 19,
+          "rank": 20,
           "player": "NAOMI",
           "score": 353
         },
         {
-          "rank": 20,
+          "rank": 21,
           "player": "Shiboli",
           "score": 352
         },
         {
-          "rank": 21,
+          "rank": 22,
           "player": "Krstnlv",
           "score": 347
-        },
-        {
-          "rank": 22,
-          "player": "AOTO",
-          "score": 339
         },
         {
           "rank": 23,
