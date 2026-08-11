@@ -1,0 +1,111 @@
+name: Generate Weekly Access Report
+
+on:
+  schedule:
+    # Every Monday at 9:00 AM PHT. Reports the completed Monday-Sunday week.
+    - cron: "0 9 * * 1"
+      timezone: "Asia/Manila"
+  workflow_dispatch:
+    inputs:
+      report_end_date:
+        description: "Report end date in YYYY-MM-DD format (blank = latest completed Sunday in PHT)"
+        required: false
+        default: ""
+        type: string
+      create_issue:
+        description: "Create or update the GitHub Issue"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Generate weekly analytics report
+        id: analytics
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          REPORT_END_DATE: ${{ inputs.report_end_date }}
+        run: node generate-analytics-report.mjs
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: after-ranking-analytics-${{ steps.analytics.outputs.report_end_date }}
+          path: |
+            ${{ steps.analytics.outputs.markdown_path }}
+            ${{ steps.analytics.outputs.json_path }}
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create or update analytics Issue
+        if: github.event_name == 'schedule' || inputs.create_issue == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT_END_DATE: ${{ steps.analytics.outputs.report_end_date }}
+          BODY_FILE: ${{ steps.analytics.outputs.markdown_path }}
+        run: |
+          set -euo pipefail
+
+          TITLE="[Analytics Report] AFTER Ranking — ${REPORT_END_DATE}"
+          MARKER="<!-- after-ranking-analytics-report:${REPORT_END_DATE} -->"
+
+          gh label create analytics-report \
+            --repo "$GITHUB_REPOSITORY" \
+            --color "6f42c1" \
+            --description "Automated weekly website analytics" \
+            --force
+
+          gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state all \
+            --limit 1000 \
+            --json number,title,body \
+            > existing-analytics-issues.json
+
+          ISSUE_NUMBER=$(MARKER="$MARKER" TITLE="$TITLE" node <<'NODE'
+          const fs = require("fs");
+          const issues = JSON.parse(fs.readFileSync("existing-analytics-issues.json", "utf8"));
+          const issue = issues.find(
+            (item) => item.title === process.env.TITLE || item.body?.includes(process.env.MARKER),
+          );
+          if (issue) process.stdout.write(String(issue.number));
+          NODE
+          )
+
+          {
+            echo "@${GITHUB_REPOSITORY_OWNER}"
+            echo
+            cat "$BODY_FILE"
+          } > analytics-issue-body.md
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$TITLE" \
+              --body-file analytics-issue-body.md \
+              --add-label analytics-report
+            echo "Updated existing Issue #${ISSUE_NUMBER}"
+          else
+            gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$TITLE" \
+              --body-file analytics-issue-body.md \
+              --label analytics-report
+          fi
