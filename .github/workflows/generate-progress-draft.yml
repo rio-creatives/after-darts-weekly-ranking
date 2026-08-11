@@ -14,7 +14,8 @@ on:
         default: false
         type: boolean
   schedule:
-    - cron: "13 15 * * *"
+    # Run after AFTER closes at 5:00 AM, with time for ranking data to refresh.
+    - cron: "13 7 * * *"
       timezone: "Asia/Manila"
 
 permissions:
@@ -77,7 +78,10 @@ jobs:
 
           const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
           const finalChallengeDay = lastDay - 3;
-          const scheduledDays = [8, 15, 22, finalChallengeDay];
+          const isAugust2026 = year === 2026 && month === 8;
+          const scheduledDays = isAugust2026
+            ? [11, 18, 25]
+            : [8, 15, 22, finalChallengeDay];
           const isManual = eventName === "workflow_dispatch";
           const shouldRun = isManual || scheduledDays.includes(day);
           const saveSnapshot = isManual
@@ -95,7 +99,7 @@ jobs:
 
           console.log(`Event: ${eventName}`);
           console.log(`PHT target date: ${targetDate}`);
-          console.log(`Scheduled days this month: 8, 15, 22, ${finalChallengeDay}`);
+          console.log(`Scheduled days this month: ${scheduledDays.join(", ")}`);
           console.log(`Generate draft: ${shouldRun}`);
           console.log(`Save snapshot: ${saveSnapshot}`);
           NODE
@@ -232,7 +236,6 @@ jobs:
         if: steps.schedule.outputs.should_run != 'true'
         env:
           TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
-          FINAL_CHALLENGE_DAY: ${{ steps.schedule.outputs.final_challenge_day }}
         run: |
           echo "${TARGET_DATE} is not a progress-post date."
-          echo "This month runs on the 8th, 15th, 22nd, and day ${FINAL_CHALLENGE_DAY}."
+          echo "See the Determine target date and schedule step for this month's dates."
