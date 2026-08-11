@@ -173,9 +173,9 @@ function getTotal(rows) {
   };
 }
 
-function percentChange(current, previous) {
+function percentChange(current, previous, locale = "en") {
   if (previous === 0) {
-    return current === 0 ? "—" : "New";
+    return current === 0 ? "—" : locale === "ja" ? "新規" : "New";
   }
   const value = ((current - previous) / previous) * 100;
   const rounded = Math.round(value);
@@ -227,6 +227,30 @@ function topTable(rows, firstColumn) {
   ].join("\n");
 }
 
+function japaneseDimensionLabel(label) {
+  const translations = {
+    Desktop: "デスクトップ",
+    Mobile: "モバイル",
+    Tablet: "タブレット",
+    Other: "その他",
+    Unknown: "不明",
+    "Direct / unknown": "直接アクセス／不明",
+  };
+  return translations[label] || label;
+}
+
+function topTableJapanese(rows, firstColumn) {
+  if (!rows.length) return "この期間のデータはありません。";
+  return [
+    `| ${firstColumn} | 訪問数 | ページビュー数 |`,
+    "|---|---:|---:|",
+    ...rows.map(
+      (row) =>
+        `| ${String(japaneseDimensionLabel(row.label)).replaceAll("|", "\\|")} | ${row.visits} | ${row.pageViews} |`,
+    ),
+  ].join("\n");
+}
+
 function createReport(account, ranges) {
   const current = getTotal(account.currentTotal);
   const previous = getTotal(account.previousTotal);
@@ -240,8 +264,7 @@ function createReport(account, ranges) {
   const previousStart = formatDateOnly(ranges.previousStart);
   const previousEnd = formatDateOnly(addDays(ranges.previousEndExclusive, -1));
 
-  const markdown = `<!-- after-ranking-analytics-report:${currentEnd} -->
-# AFTER Ranking Website — Weekly Access Report
+  const englishReport = `# AFTER Ranking Website — Weekly Access Report
 
 **Period:** ${currentStart} to ${currentEnd} (PHT)  
 **Comparison:** ${previousStart} to ${previousEnd} (PHT)  
@@ -282,6 +305,56 @@ ${topTable(referrers, "Source")}
 - Small weekly totals can produce large percentage swings, so use the trend together with actual counts.
 
 _Generated automatically from Cloudflare Web Analytics._
+`;
+
+  const markdown = `<!-- after-ranking-analytics-report:${currentEnd} -->
+# AFTERランキングサイト — 週次アクセスレポート
+
+**対象期間：** ${currentStart}〜${currentEnd}（PHT）  
+**比較期間：** ${previousStart}〜${previousEnd}（PHT）  
+**サイト：** https://${REPORT_HOST}/
+
+## サマリー
+
+| 指標 | 今週 | 前週 | 前週比 |
+|---|---:|---:|---:|
+| 訪問数 | ${current.visits} | ${previous.visits} | ${percentChange(current.visits, previous.visits, "ja")} |
+| ページビュー数 | ${current.pageViews} | ${previous.pageViews} | ${percentChange(current.pageViews, previous.pageViews, "ja")} |
+| 1訪問あたりのPV | ${ratio(current.pageViews, current.visits)} | ${ratio(previous.pageViews, previous.visits)} | — |
+
+## 日別推移
+
+| 日付（PHT） | 訪問数 | ページビュー数 |
+|---|---:|---:|
+${daily.map((row) => `| ${row.date} | ${row.visits} | ${row.pageViews} |`).join("\n")}
+
+## 国別アクセス
+
+${topTableJapanese(countries, "国")}
+
+## 端末
+
+${topTableJapanese(devices, "端末")}
+
+## 流入元
+
+${topTableJapanese(referrers, "流入元")}
+
+## レポートの見方
+
+- **訪問数**は訪問セッション数であり、厳密なユニークユーザー数ではありません。
+- **ページビュー数**は、ページが正常に読み込まれた回数です。
+- Cloudflareの集計条件により、既知のBotは除外されています。
+- 店内モニターは、その端末でアクセス解析の除外設定を有効にした後から集計対象外になります。
+- 週ごとの母数が少ない場合、前週比が大きく変動するため、割合だけでなく実数も併せて確認してください。
+
+_Cloudflare Web Analyticsのデータから自動生成されています。_
+
+<details>
+<summary><strong>English version</strong></summary>
+
+${englishReport}
+</details>
 `;
 
   return {
