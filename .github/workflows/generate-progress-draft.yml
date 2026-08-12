@@ -113,11 +113,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
-
-      - name: Install image dependencies
-        if: steps.schedule.outputs.should_run == 'true'
-        run: npm ci
 
       - name: Generate ranking progress draft
         if: steps.schedule.outputs.should_run == 'true'
@@ -127,12 +122,6 @@ jobs:
           SAVE_SNAPSHOT: ${{ steps.schedule.outputs.save_snapshot }}
         run: node generate-progress-draft.mjs
 
-      - name: Generate fixed Facebook ranking image
-        if: steps.schedule.outputs.should_run == 'true'
-        env:
-          TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
-        run: node generate-facebook-ranking-image.mjs
-
       - name: Upload generated draft
         if: steps.schedule.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
@@ -141,41 +130,34 @@ jobs:
           path: |
             generated/progress-draft-${{ steps.schedule.outputs.target_date }}.md
             generated/progress-draft-${{ steps.schedule.outputs.target_date }}.json
-            generated/facebook-ranking-${{ steps.schedule.outputs.target_date }}.png
             data/progress-snapshots/${{ steps.schedule.outputs.target_date }}.json
           if-no-files-found: error
           retention-days: 14
 
-      - name: Commit ranking progress assets
-        if: steps.schedule.outputs.should_run == 'true'
+      - name: Commit ranking progress snapshot
+        if: steps.schedule.outputs.should_run == 'true' && steps.schedule.outputs.save_snapshot == 'true'
         env:
           TARGET_DATE: ${{ steps.schedule.outputs.target_date }}
-          SAVE_SNAPSHOT: ${{ steps.schedule.outputs.save_snapshot }}
         run: |
           set -euo pipefail
 
           SNAPSHOT_FILE="data/progress-snapshots/${TARGET_DATE}.json"
-          IMAGE_FILE="generated/facebook-ranking-${TARGET_DATE}.png"
 
-          if [ ! -f "$IMAGE_FILE" ]; then
-            echo "Generated Facebook image was not found: $IMAGE_FILE"
-            exit 1
+          if [ ! -f "$SNAPSHOT_FILE" ]; then
+            echo "Snapshot was not saved because the ranking data was not safe for the target date."
+            exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$IMAGE_FILE"
-
-          if [ "$SAVE_SNAPSHOT" = "true" ] && [ -f "$SNAPSHOT_FILE" ]; then
-            git add "$SNAPSHOT_FILE"
-          fi
+          git add "$SNAPSHOT_FILE"
 
           if git diff --cached --quiet; then
-            echo "Progress assets are already up to date."
+            echo "Snapshot is already up to date."
             exit 0
           fi
 
-          git commit -m "Generate ranking progress assets ${TARGET_DATE}"
+          git commit -m "Save ranking progress snapshot ${TARGET_DATE}"
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
@@ -204,12 +186,6 @@ jobs:
             echo
             echo "**Review required:** This draft was generated automatically."
             echo "Please confirm the player names, scores, data freshness, comparison facts, and wording before posting."
-            echo
-            echo "## Facebook 4:5 image — fixed template"
-            echo
-            echo "![AFTER ranking ${TARGET_DATE}](https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/generated/facebook-ranking-${TARGET_DATE}.png)"
-            echo
-            echo "[Open or download the full-resolution PNG](https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/generated/facebook-ranking-${TARGET_DATE}.png)"
             echo
             cat "$BODY_FILE"
           } > issue-body.md
