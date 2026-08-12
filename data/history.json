@@ -6,8 +6,8 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-13T04:59:15+08:00",
-  "source": "https://www.dartslive.com/ph/ranking/",
+  "lastSuccessfulCheckAt": "2026-08-13T05:58:17+08:00",
+  "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
       "periodStart": "2026-07-01T00:00:00+08:00",
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-13T04:59:15+08:00",
+      "updatedAt": "2026-08-13T05:58:17+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -110,76 +110,6 @@
           "rank": 10,
           "player": "TRYO",
           "score": 457
-        },
-        {
-          "rank": 11,
-          "player": "Queen",
-          "score": 437
-        },
-        {
-          "rank": 12,
-          "player": "Rj45",
-          "score": 435
-        },
-        {
-          "rank": 13,
-          "player": "AOTO",
-          "score": 434
-        },
-        {
-          "rank": 14,
-          "player": "Prince",
-          "score": 433
-        },
-        {
-          "rank": 15,
-          "player": "Akirose",
-          "score": 430
-        },
-        {
-          "rank": 16,
-          "player": "Maechan",
-          "score": 417
-        },
-        {
-          "rank": 17,
-          "player": "Boricat ellen",
-          "score": 381
-        },
-        {
-          "rank": 18,
-          "player": "Peter",
-          "score": 358
-        },
-        {
-          "rank": 19,
-          "player": "Wakkanai!",
-          "score": 353
-        },
-        {
-          "rank": 20,
-          "player": "NAOMI",
-          "score": 353
-        },
-        {
-          "rank": 21,
-          "player": "Shiboli",
-          "score": 352
-        },
-        {
-          "rank": 22,
-          "player": "Krstnlv",
-          "score": 347
-        },
-        {
-          "rank": 23,
-          "player": "Lara psai",
-          "score": 307
-        },
-        {
-          "rank": 24,
-          "player": "Kath24",
-          "score": 252
         }
       ]
     }
