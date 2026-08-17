@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-18T01:52:07+08:00",
+  "lastSuccessfulCheckAt": "2026-08-18T02:29:31+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "months": {
     "2026-07": {
@@ -59,12 +59,12 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-18T01:52:07+08:00",
+      "updatedAt": "2026-08-18T02:29:31+08:00",
       "rankings": [
         {
           "rank": 1,
           "player": "Rei",
-          "score": 637
+          "score": 732
         },
         {
           "rank": 2,
