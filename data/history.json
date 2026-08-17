@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-17T21:12:02+08:00",
+  "lastSuccessfulCheckAt": "2026-08-17T22:39:12+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "months": {
     "2026-07": {
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-17T21:12:02+08:00",
+      "updatedAt": "2026-08-17T22:39:12+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -83,13 +83,13 @@
         },
         {
           "rank": 5,
-          "player": "The Boss",
-          "score": 526
+          "player": "RYO",
+          "score": 546
         },
         {
           "rank": 6,
-          "player": "RYO",
-          "score": 521
+          "player": "The Boss",
+          "score": 526
         },
         {
           "rank": 7,
