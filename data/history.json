@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-08-18T23:53:12+08:00",
+  "lastSuccessfulCheckAt": "2026-08-19T01:07:03+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "months": {
     "2026-07": {
@@ -59,7 +59,7 @@
     "2026-08": {
       "periodStart": "2026-08-01T00:00:00+08:00",
       "periodEnd": "2026-08-31T23:59:59+08:00",
-      "updatedAt": "2026-08-18T23:53:12+08:00",
+      "updatedAt": "2026-08-19T01:07:03+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -113,18 +113,18 @@
         },
         {
           "rank": 11,
+          "player": "AOTO",
+          "score": 449
+        },
+        {
+          "rank": 12,
           "player": "Queen",
           "score": 437
         },
         {
-          "rank": 12,
+          "rank": 13,
           "player": "Rj45",
           "score": 435
-        },
-        {
-          "rank": 13,
-          "player": "AOTO",
-          "score": 434
         },
         {
           "rank": 14,
