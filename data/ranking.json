@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-08-01T00:00:00+08:00",
   "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-28T19:17:24+08:00",
+  "updatedAt": "2026-08-29T05:28:20+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "rankings": [
     {
@@ -97,41 +97,46 @@
     },
     {
       "rank": 19,
+      "player": "ROSE",
+      "score": 397
+    },
+    {
+      "rank": 20,
       "player": "Boricat ellen",
       "score": 381
     },
     {
-      "rank": 20,
+      "rank": 21,
       "player": "Peter",
       "score": 358
     },
     {
-      "rank": 21,
+      "rank": 22,
       "player": "NAOMI",
       "score": 353
     },
     {
-      "rank": 22,
+      "rank": 23,
       "player": "Shiboli",
       "score": 352
     },
     {
-      "rank": 23,
+      "rank": 24,
       "player": "Krstnlv",
       "score": 347
     },
     {
-      "rank": 24,
+      "rank": 25,
       "player": "Yumi_Ookini",
       "score": 316
     },
     {
-      "rank": 25,
+      "rank": 26,
       "player": "Lara psai",
       "score": 307
     },
     {
-      "rank": 26,
+      "rank": 27,
       "player": "Kath24",
       "score": 252
     }
