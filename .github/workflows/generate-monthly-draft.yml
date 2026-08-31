@@ -2,9 +2,8 @@ name: Generate Monthly Ranking Draft
 
 on:
   schedule:
-    # Monthly SNS email: 9:00 AM Philippine time on the 1st.
-    - cron: "0 9 1 * *"
-      timezone: "Asia/Manila"
+    # Monthly SNS email: 9:00 AM Philippine time (01:00 UTC) on the 1st.
+    - cron: "0 1 1 * *"
 
   workflow_dispatch:
     inputs:
