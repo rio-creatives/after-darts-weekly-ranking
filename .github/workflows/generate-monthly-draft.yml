@@ -2,9 +2,8 @@ name: Generate Monthly Ranking Draft
 
 on:
   schedule:
-    # Check the 1st and 2nd at 7:13 AM Philippine time, after AFTER closes.
-    # August 2026 is generated on September 1; other months remain on the 2nd.
-    - cron: "13 7 1,2 * *"
+    # Monthly SNS email: 9:00 AM Philippine time on the 1st.
+    - cron: "0 9 1 * *"
       timezone: "Asia/Manila"
 
   workflow_dispatch:
@@ -42,10 +41,7 @@ jobs:
           if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
             TARGET_MONTH="${INPUT_MONTH:-$PREVIOUS_MONTH}"
             SHOULD_RUN=true
-          elif [ "${TODAY_PHT}" = "2026-09-01" ]; then
-            TARGET_MONTH="2026-08"
-            SHOULD_RUN=true
-          elif [ "${DAY_PHT}" = "02" ] && [ "${TODAY_PHT}" != "2026-09-02" ]; then
+          elif [ "${DAY_PHT}" = "01" ]; then
             TARGET_MONTH="$PREVIOUS_MONTH"
             SHOULD_RUN=true
           else
@@ -80,6 +76,10 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TARGET_MONTH: ${{ steps.target.outputs.month }}
         run: node generate-monthly-draft.mjs
+
+      - name: Verify Monthly Champion caption formatting
+        if: steps.target.outputs.should_run == 'true'
+        run: node --test monthly-champion-post.test.mjs
 
       - name: Upload generated draft
         if: steps.target.outputs.should_run == 'true'

@@ -1,6 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import {
+  buildMonthlyChampionPost,
+  createMonthlyChampionMarkdown,
+  validateFinalMonthData,
+} from "./monthly-champion-post.mjs";
+
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -188,6 +194,7 @@ function validateDraft(draft) {
 function createMarkdown({
   draft,
   facts,
+  monthlyChampionPost,
   selectedModel,
   generatedAt,
 }) {
@@ -255,7 +262,56 @@ ${draft.internalReport.dataLimitations}
 - Runner-up score: ${facts.runnerUp?.score ?? "N/A"}
 - Gap: ${facts.gap ?? "N/A"} points
 - Ranking entries: ${facts.rankingEntryCount}
+
+${createMonthlyChampionMarkdown(monthlyChampionPost)}
 `;
+}
+
+async function writeUnavailableMonthlyDraft(validationErrors) {
+  const generatedAt = new Date().toISOString();
+  const monthlyChampionPost = {
+    status: "skipped",
+    reason: "Previous month final ranking unavailable.",
+    validationErrors,
+  };
+  const outputDirectory = "generated";
+  const markdown = `# AFTER Monthly Ranking Draft
+
+## Generation information
+
+- Target month: ${formatMonth(targetMonth)}
+- Generated at: ${generatedAt}
+- Status: Previous month final ranking unavailable
+
+${createMonthlyChampionMarkdown(monthlyChampionPost)}
+`;
+
+  await fs.mkdir(outputDirectory, { recursive: true });
+  await fs.writeFile(
+    path.join(outputDirectory, `monthly-draft-${targetMonth}.json`),
+    JSON.stringify(
+      {
+        targetMonth,
+        generatedAt,
+        facts: null,
+        draft: null,
+        monthlyChampionPost,
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+  await fs.writeFile(
+    path.join(outputDirectory, `monthly-draft-${targetMonth}.md`),
+    markdown,
+    "utf8"
+  );
+
+  console.warn(monthlyChampionPost.reason);
+  for (const error of validationErrors) {
+    console.warn(`- ${error}`);
+  }
 }
 
 async function main() {
@@ -266,11 +322,14 @@ async function main() {
 
   const history = JSON.parse(historyText);
   const monthData = history.months?.[targetMonth];
+  const finalDataErrors = validateFinalMonthData(
+    targetMonth,
+    monthData
+  );
 
-  if (!monthData) {
-    throw new Error(
-      `No ranking data was found for ${targetMonth}.`
-    );
+  if (finalDataErrors.length > 0) {
+    await writeUnavailableMonthlyDraft(finalDataErrors);
+    return;
   }
 
   const rankings = [...(monthData.rankings || [])]
@@ -282,13 +341,7 @@ async function main() {
     )
     .sort((a, b) => a.rank - b.rank);
 
-  if (rankings.length === 0) {
-    throw new Error(
-      `The ranking for ${targetMonth} contains no entries.`
-    );
-  }
-
-  const champion = rankings[0];
+  const champion = rankings.find((entry) => entry.rank === 1);
   const runnerUp = rankings[1] || null;
   const gap = runnerUp
     ? champion.score - runnerUp.score
@@ -456,6 +509,11 @@ Return exactly this JSON structure:
   validateDraft(draft);
 
   const generatedAt = new Date().toISOString();
+  const monthlyChampionPost = buildMonthlyChampionPost({
+    monthKey: targetMonth,
+    player: champion.player,
+    score: champion.score,
+  });
 
   const output = {
     targetMonth,
@@ -463,6 +521,7 @@ Return exactly this JSON structure:
     generatedAt,
     facts,
     draft,
+    monthlyChampionPost,
   };
 
   const outputDirectory = "generated";
@@ -489,6 +548,7 @@ Return exactly this JSON structure:
   const markdown = createMarkdown({
     draft,
     facts,
+    monthlyChampionPost,
     selectedModel: modelId,
     generatedAt,
   });
