@@ -110,7 +110,7 @@
     const rewardText = document.createElement("span");
     rewardText.className = "leader-reward-text";
     rewardText.textContent = showingPreviousFinal
-      ? `${displayMonthLabel} MONTHLY CHAMPION`
+      ? "GET YOUR REWARD!"
       : "MONTHLY REWARD WITHIN REACH";
 
     const countdown = document.createElement("span");
@@ -151,7 +151,7 @@
         : `${playerName}, current leader`,
       `${leaderScore.toLocaleString("en-US")} points`,
       showingPreviousFinal
-        ? `${displayMonthLabel} monthly champion`
+        ? "get your reward"
         : "monthly reward within reach",
       ...(!showingPreviousFinal && monthStatus.showCountdown
         ? [monthStatus.countdownLabel.toLowerCase()]
