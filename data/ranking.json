@@ -1,27 +1,22 @@
 {
   "periodType": "monthly",
-  "periodStart": "2026-08-01T00:00:00+08:00",
-  "periodEnd": "2026-08-31T23:59:59+08:00",
-  "updatedAt": "2026-08-31T23:02:37+08:00",
-  "source": "https://www.dartslive.com/ph/ranking/",
-  "displayMode": "previous_month_final",
+  "periodStart": "2026-09-01T00:00:00+08:00",
+  "periodEnd": "2026-09-30T23:59:59+08:00",
+  "updatedAt": "2026-09-02T02:25:36+08:00",
+  "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
+  "displayMode": "current_month",
   "currentMonth": "2026-09",
-  "displayMonth": "2026-08",
+  "displayMonth": "2026-09",
   "rankings": [
     {
       "rank": 1,
-      "player": "Rei",
-      "score": 750
+      "player": "YUTA",
+      "score": 533
     },
     {
       "rank": 2,
-      "player": "KEISUKE",
-      "score": 600
-    },
-    {
-      "rank": 3,
-      "player": "Ryota",
-      "score": 595
+      "player": "RYO YABUSAME",
+      "score": 422
     }
   ]
 }
