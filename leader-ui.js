@@ -120,7 +120,7 @@
     const challenge = document.createElement("span");
     challenge.className = "leader-challenge";
     challenge.textContent = showingPreviousFinal
-      ? `CONGRATS! ${playerName}!`
+      ? `CONGRATS! ${playerName.toUpperCase()}!`
       : `STAY #1 THROUGH ${monthStatus.deadlineLabel}`;
 
     const gap = document.createElement("span");
