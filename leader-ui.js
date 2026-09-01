@@ -86,6 +86,8 @@
       monthLabelFromKey(screen?.dataset.displayMonth) || "PREVIOUS MONTH";
     const currentMonthLabel =
       monthLabelFromKey(screen?.dataset.currentMonth) || "NEW MONTH";
+    const playerName =
+      leader.querySelector(".player-name")?.textContent?.trim() || "CHAMPION";
 
     const badge = document.createElement("p");
     badge.className = "leader-badge";
@@ -118,7 +120,7 @@
     const challenge = document.createElement("span");
     challenge.className = "leader-challenge";
     challenge.textContent = showingPreviousFinal
-      ? `${currentMonthLabel} RANKING STARTS FRESH`
+      ? `CONGRATS! ${playerName}!`
       : `STAY #1 THROUGH ${monthStatus.deadlineLabel}`;
 
     const gap = document.createElement("span");
@@ -143,8 +145,6 @@
     leader.append(rewardRow, footer);
     leader.dataset.leaderEnhanced = "true";
 
-    const playerName =
-      leader.querySelector(".player-name")?.textContent?.trim() || "Current leader";
     const accessibilityLabel = [
       showingPreviousFinal
         ? `${playerName}, final number one for ${displayMonthLabel}`
@@ -157,7 +157,7 @@
         ? [monthStatus.countdownLabel.toLowerCase()]
         : []),
       showingPreviousFinal
-        ? `${currentMonthLabel} ranking starts fresh`
+        ? `congratulations, ${playerName}`
         : `stay number one through ${monthStatus.deadlineLabel}`,
       showingPreviousFinal ? "final score" : leadMessage.toLowerCase(),
     ].join(", ");
