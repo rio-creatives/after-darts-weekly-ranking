@@ -31,6 +31,18 @@ const updateFormatter = new Intl.DateTimeFormat("en-US", {
   hour12: true,
 });
 
+function monthLabelFromKey(monthKey) {
+  const match = String(monthKey || "").match(/^(\d{4})-(\d{2})$/);
+  if (!match) return "";
+
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    month: "long",
+  })
+    .format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)))
+    .toUpperCase();
+}
+
 function ordinal(rank) {
   if (rank === 1) return "ST";
   if (rank === 2) return "ND";
@@ -88,6 +100,31 @@ function renderListEntry(player) {
 function render(data) {
   latestRankingData = data;
 
+  const displayMode =
+    data.displayMode === "previous_month_final"
+      ? "previous_month_final"
+      : "current_month";
+  const showingPreviousFinal = displayMode === "previous_month_final";
+  const displayMonthLabel =
+    monthLabelFromKey(data.displayMonth) ||
+    dateFormatter.format(new Date(data.periodStart || data.weekStart)).split(" ")[0].toUpperCase();
+  const currentMonthLabel =
+    monthLabelFromKey(data.currentMonth) || displayMonthLabel;
+  const screen = document.querySelector(".screen");
+  const title = document.querySelector("h1");
+  const statusLabel = document.querySelector(".live-status span:last-child");
+
+  screen.dataset.displayMode = displayMode;
+  screen.dataset.displayMonth = data.displayMonth || "";
+  screen.dataset.currentMonth = data.currentMonth || "";
+
+  title.innerHTML = showingPreviousFinal
+    ? `${displayMonthLabel} <span>FINAL TOP 3</span>`
+    : "MONTHLY <span>COUNT-UP</span> RANKING";
+  statusLabel.textContent = showingPreviousFinal
+    ? `${currentMonthLabel} RANKING UPDATING`
+    : "LIVE UPDATE";
+
   const rankings = Array.isArray(data.rankings) ? data.rankings : [];
   const allSorted = rankings
     .map((player, index) => ({
@@ -96,9 +133,11 @@ function render(data) {
       score: Number(player.score) || 0,
     }))
     .sort((a, b) => a.rank - b.rank);
-  const sorted = MOBILE_RANKING_QUERY.matches
-    ? allSorted
-    : allSorted.slice(0, DESKTOP_RANKING_LIMIT);
+  const sorted = showingPreviousFinal
+    ? allSorted.slice(0, 3)
+    : MOBILE_RANKING_QUERY.matches
+      ? allSorted
+      : allSorted.slice(0, DESKTOP_RANKING_LIMIT);
 
   const podium = document.querySelector("#podium");
   const rankingList = document.querySelector("#rankingList");
@@ -110,11 +149,19 @@ function render(data) {
 
   const periodStart = new Date(data.periodStart || data.weekStart);
   const periodEnd = new Date(data.periodEnd || data.weekEnd);
-  document.querySelector("#weekRange").textContent =
-    `${dateFormatter.format(periodStart)} — ${dateFormatter.format(periodEnd)}`;
-  document.querySelector(".footer p:first-child").textContent =
-    "PLAYER'S BEST SCORE OF THE MONTH";
+  document.querySelector("#weekRange").textContent = showingPreviousFinal
+    ? `${currentMonthLabel} RANKING STARTS FRESH • ${displayMonthLabel} FINAL RESULTS`
+    : `${dateFormatter.format(periodStart)} — ${dateFormatter.format(periodEnd)}`;
+  document.querySelector(".footer p:first-child").textContent = showingPreviousFinal
+    ? "PREVIOUS MONTH FINAL TOP 3"
+    : "PLAYER'S BEST SCORE OF THE MONTH";
 
+  const footerUpdate = document.querySelector(".footer p:last-child");
+  if (footerUpdate.firstChild) {
+    footerUpdate.firstChild.textContent = showingPreviousFinal
+      ? "FINALIZED "
+      : "UPDATED ";
+  }
   document.querySelector("#updatedAt").textContent = updateFormatter
     .format(new Date(data.updatedAt))
     .toUpperCase();

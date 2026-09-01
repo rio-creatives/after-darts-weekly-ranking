@@ -1,9 +1,12 @@
 {
   "periodType": "monthly",
-  "periodStart": "2026-09-01T00:00:00+08:00",
-  "periodEnd": "2026-09-30T23:59:59+08:00",
-  "updatedAt": "2026-09-01T04:48:06+08:00",
+  "periodStart": "2026-08-01T00:00:00+08:00",
+  "periodEnd": "2026-08-31T23:59:59+08:00",
+  "updatedAt": "2026-08-31T23:02:37+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
+  "displayMode": "previous_month_final",
+  "currentMonth": "2026-09",
+  "displayMonth": "2026-08",
   "rankings": [
     {
       "rank": 1,
@@ -19,136 +22,6 @@
       "rank": 3,
       "player": "Ryota",
       "score": 595
-    },
-    {
-      "rank": 4,
-      "player": "YUTA",
-      "score": 569
-    },
-    {
-      "rank": 5,
-      "player": "RYO",
-      "score": 546
-    },
-    {
-      "rank": 6,
-      "player": "The Boss",
-      "score": 526
-    },
-    {
-      "rank": 7,
-      "player": "ROSE",
-      "score": 490
-    },
-    {
-      "rank": 8,
-      "player": "AKO",
-      "score": 484
-    },
-    {
-      "rank": 9,
-      "player": "MARUFUJI",
-      "score": 481
-    },
-    {
-      "rank": 10,
-      "player": "TRYO",
-      "score": 457
-    },
-    {
-      "rank": 11,
-      "player": "AOTO",
-      "score": 449
-    },
-    {
-      "rank": 12,
-      "player": "Queen",
-      "score": 437
-    },
-    {
-      "rank": 13,
-      "player": "Rj45",
-      "score": 435
-    },
-    {
-      "rank": 14,
-      "player": "Prince",
-      "score": 433
-    },
-    {
-      "rank": 15,
-      "player": "Akirose",
-      "score": 430
-    },
-    {
-      "rank": 16,
-      "player": "Johann",
-      "score": 430
-    },
-    {
-      "rank": 17,
-      "player": "Okayaman",
-      "score": 425
-    },
-    {
-      "rank": 18,
-      "player": "Maechan",
-      "score": 417
-    },
-    {
-      "rank": 19,
-      "player": "ROSE",
-      "score": 401
-    },
-    {
-      "rank": 20,
-      "player": "Wakkanai!",
-      "score": 399
-    },
-    {
-      "rank": 21,
-      "player": "Kei",
-      "score": 393
-    },
-    {
-      "rank": 22,
-      "player": "Boricat ellen",
-      "score": 381
-    },
-    {
-      "rank": 23,
-      "player": "Peter",
-      "score": 358
-    },
-    {
-      "rank": 24,
-      "player": "NAOMI",
-      "score": 353
-    },
-    {
-      "rank": 25,
-      "player": "Shiboli",
-      "score": 352
-    },
-    {
-      "rank": 26,
-      "player": "Krstnlv",
-      "score": 347
-    },
-    {
-      "rank": 27,
-      "player": "Yumi_Ookini",
-      "score": 316
-    },
-    {
-      "rank": 28,
-      "player": "Lara psai",
-      "score": 307
-    },
-    {
-      "rank": 29,
-      "player": "Kath24",
-      "score": 252
     }
   ]
 }

@@ -569,65 +569,158 @@ function hasRankings(monthRanking) {
   return Array.isArray(monthRanking?.rankings) && monthRanking.rankings.length > 0;
 }
 
+function rankingsMatch(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
+    return false;
+  }
+
+  return left.every((entry, index) => {
+    const other = right[index];
+    return (
+      Number(entry.rank) === Number(other?.rank) &&
+      correctPlayerName(String(entry.player ?? "")) ===
+        correctPlayerName(String(other?.player ?? "")) &&
+      Number(entry.score) === Number(other?.score)
+    );
+  });
+}
+
+function getTopThree(monthRanking) {
+  return [...(monthRanking?.rankings ?? [])]
+    .sort((a, b) => Number(a.rank) - Number(b.rank))
+    .slice(0, 3);
+}
+
 async function main() {
   const now = new Date();
-  const updatedAt = toPhtIso(now);
+  const attemptedAt = toPhtIso(now);
   const month = getMonth(now);
-  const fetched = await scrapeMonthlyRanking();
-  let rankings = fetched.rankings;
-  const { source } = fetched;
   const history = await readHistory();
 
   history.months ??= {};
-  const savedCurrentRanking = history.months[month.key];
-  const fetchedCurrentRanking = {
-    periodStart: toPhtIso(month.start),
-    periodEnd: toPhtIso(month.end),
-    updatedAt,
-    rankings,
-  };
 
-  // A temporary zero-result response must not erase rankings already saved for
-  // the current month. Replace the saved month only when fresh entries exist,
-  // or when this month has never been stored before.
-  if (rankings.length > 0 || !savedCurrentRanking) {
-    history.months[month.key] = fetchedCurrentRanking;
+  const previousRanking = getLatestPreviousRanking(history, month.key);
+  let savedCurrentRanking = history.months[month.key];
+  let fetchFailed = false;
+  let fetched;
+
+  try {
+    fetched = await scrapeMonthlyRanking();
+  } catch (error) {
+    fetchFailed = true;
+    fetched = {
+      rankings: [],
+      source: history.source || SHOP_URL,
+    };
+    console.warn(
+      `Ranking fetch unavailable; preserving the last verified display: ${error.message}`,
+    );
+  }
+
+  let rankings = Array.isArray(fetched.rankings) ? fetched.rankings : [];
+  const source = fetched.source || history.source || SHOP_URL;
+
+  // DARTSLIVE can briefly keep the previous month's list under "This Month"
+  // immediately after the calendar changes. Never store an exact copy of the
+  // previous final ranking as a new month's ranking.
+  const savedCurrentIsPreviousCopy =
+    hasRankings(savedCurrentRanking) &&
+    hasRankings(previousRanking) &&
+    rankingsMatch(savedCurrentRanking.rankings, previousRanking.rankings);
+
+  if (savedCurrentIsPreviousCopy) {
+    delete history.months[month.key];
+    savedCurrentRanking = null;
+    console.warn(
+      `Removed ${month.key} because it exactly duplicated ${previousRanking.key}.`,
+    );
+  }
+
+  const fetchedIsPreviousCopy =
+    rankings.length > 0 &&
+    hasRankings(previousRanking) &&
+    rankingsMatch(rankings, previousRanking.rankings);
+
+  if (fetchedIsPreviousCopy) {
+    rankings = [];
+    console.warn(
+      `Ignored fetched ${month.key} data because it exactly matched ${previousRanking.key}.`,
+    );
+  }
+
+  const verifiedCheck = !fetchFailed && !fetchedIsPreviousCopy;
+
+  if (rankings.length > 0) {
+    history.months[month.key] = {
+      periodStart: toPhtIso(month.start),
+      periodEnd: toPhtIso(month.end),
+      updatedAt: attemptedAt,
+      rankings,
+    };
+    savedCurrentRanking = history.months[month.key];
+  }
+
+  if (verifiedCheck) {
+    history.lastSuccessfulCheckAt = attemptedAt;
+    history.source = source;
   }
 
   const retainedKeys = Object.keys(history.months).sort().slice(-MAX_HISTORY_MONTHS);
   history.months = Object.fromEntries(
     retainedKeys.map((key) => [key, history.months[key]]),
   );
-  history.lastSuccessfulCheckAt = updatedAt;
-  history.source = source;
 
-  const previousRanking = getLatestPreviousRanking(history, month.key);
-  const displayedRanking =
-    rankings.length > 0
-      ? history.months[month.key]
-      : hasRankings(savedCurrentRanking)
-        ? savedCurrentRanking
-        : previousRanking ?? history.months[month.key];
+  const currentRanking = history.months[month.key];
+  let ranking;
 
-  const ranking = {
-    periodType: "monthly",
-    periodStart: displayedRanking.periodStart,
-    periodEnd: displayedRanking.periodEnd,
-    updatedAt,
-    source,
-    rankings: displayedRanking.rankings,
-  };
+  if (hasRankings(currentRanking)) {
+    ranking = {
+      periodType: "monthly",
+      periodStart: currentRanking.periodStart,
+      periodEnd: currentRanking.periodEnd,
+      updatedAt: currentRanking.updatedAt,
+      source,
+      displayMode: "current_month",
+      currentMonth: month.key,
+      displayMonth: month.key,
+      rankings: currentRanking.rankings,
+    };
+  } else if (hasRankings(previousRanking)) {
+    ranking = {
+      periodType: "monthly",
+      periodStart: previousRanking.periodStart,
+      periodEnd: previousRanking.periodEnd,
+      updatedAt: verifiedCheck ? attemptedAt : previousRanking.updatedAt,
+      source: history.source || source,
+      displayMode: "previous_month_final",
+      currentMonth: month.key,
+      displayMonth: previousRanking.key,
+      rankings: getTopThree(previousRanking),
+    };
+  } else {
+    ranking = {
+      periodType: "monthly",
+      periodStart: toPhtIso(month.start),
+      periodEnd: toPhtIso(month.end),
+      updatedAt: attemptedAt,
+      source,
+      displayMode: "current_month",
+      currentMonth: month.key,
+      displayMonth: month.key,
+      rankings: [],
+    };
+  }
 
   await writeFile(HISTORY_FILE, `${JSON.stringify(history, null, 2)}\n`);
   await writeFile(RANKING_FILE, `${JSON.stringify(ranking, null, 2)}\n`);
 
-  if (rankings.length === 0 && hasRankings(savedCurrentRanking)) {
+  if (ranking.displayMode === "previous_month_final") {
     console.log(
-      `No entries found for ${month.key}; keeping the latest saved current-month ranking.`,
+      `No verified entries found for ${month.key}; displaying ${ranking.displayMonth} final Top 3.`,
     );
-  } else if (rankings.length === 0 && previousRanking) {
+  } else if (rankings.length === 0 && hasRankings(savedCurrentRanking)) {
     console.log(
-      `No entries found for ${month.key}; continuing to display ${previousRanking.key}.`,
+      `No fresh entries found for ${month.key}; keeping the latest verified current-month ranking.`,
     );
   } else {
     console.log(`Saved ${rankings.length} monthly entries for ${month.key}.`);

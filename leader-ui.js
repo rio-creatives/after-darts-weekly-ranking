@@ -40,6 +40,18 @@
     };
   }
 
+  function monthLabelFromKey(monthKey) {
+    const match = String(monthKey || "").match(/^(\d{4})-(\d{2})$/);
+    if (!match) return "";
+
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "UTC",
+      month: "long",
+    })
+      .format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)))
+      .toUpperCase();
+  }
+
   function readScore(card) {
     const rawScore = card?.querySelector(".player-score")?.textContent || "0";
     return Number(rawScore.replace(/[^\d.-]/g, "")) || 0;
@@ -67,10 +79,17 @@
       Boolean(secondPlace),
     );
     const monthStatus = getManilaMonthStatus();
+    const screen = document.querySelector(".screen");
+    const showingPreviousFinal =
+      screen?.dataset.displayMode === "previous_month_final";
+    const displayMonthLabel =
+      monthLabelFromKey(screen?.dataset.displayMonth) || "PREVIOUS MONTH";
+    const currentMonthLabel =
+      monthLabelFromKey(screen?.dataset.currentMonth) || "NEW MONTH";
 
     const badge = document.createElement("p");
     badge.className = "leader-badge";
-    badge.textContent = "CURRENT LEADER";
+    badge.textContent = showingPreviousFinal ? "FINAL #1" : "CURRENT LEADER";
 
     const footer = document.createElement("div");
     footer.className = "leader-footer";
@@ -88,7 +107,9 @@
 
     const rewardText = document.createElement("span");
     rewardText.className = "leader-reward-text";
-    rewardText.textContent = "MONTHLY REWARD WITHIN REACH";
+    rewardText.textContent = showingPreviousFinal
+      ? `${displayMonthLabel} MONTHLY CHAMPION`
+      : "MONTHLY REWARD WITHIN REACH";
 
     const countdown = document.createElement("span");
     countdown.className = "leader-countdown";
@@ -96,11 +117,13 @@
 
     const challenge = document.createElement("span");
     challenge.className = "leader-challenge";
-    challenge.textContent = `STAY #1 THROUGH ${monthStatus.deadlineLabel}`;
+    challenge.textContent = showingPreviousFinal
+      ? `${currentMonthLabel} RANKING STARTS FRESH`
+      : `STAY #1 THROUGH ${monthStatus.deadlineLabel}`;
 
     const gap = document.createElement("span");
     gap.className = "leader-gap";
-    gap.textContent = leadMessage;
+    gap.textContent = showingPreviousFinal ? "FINAL SCORE" : leadMessage;
 
     const spotlight = document.createElement("span");
     spotlight.className = "leader-spotlight";
@@ -112,7 +135,7 @@
 
     rewardBadge.append(rewardIcon, rewardText);
     rewardRow.append(rewardBadge);
-    if (monthStatus.showCountdown) {
+    if (!showingPreviousFinal && monthStatus.showCountdown) {
       rewardRow.append(countdown);
     }
     footer.append(challenge, gap);
@@ -123,14 +146,20 @@
     const playerName =
       leader.querySelector(".player-name")?.textContent?.trim() || "Current leader";
     const accessibilityLabel = [
-      `${playerName}, current leader`,
+      showingPreviousFinal
+        ? `${playerName}, final number one for ${displayMonthLabel}`
+        : `${playerName}, current leader`,
       `${leaderScore.toLocaleString("en-US")} points`,
-      "monthly reward within reach",
-      ...(monthStatus.showCountdown
+      showingPreviousFinal
+        ? `${displayMonthLabel} monthly champion`
+        : "monthly reward within reach",
+      ...(!showingPreviousFinal && monthStatus.showCountdown
         ? [monthStatus.countdownLabel.toLowerCase()]
         : []),
-      `stay number one through ${monthStatus.deadlineLabel}`,
-      leadMessage.toLowerCase(),
+      showingPreviousFinal
+        ? `${currentMonthLabel} ranking starts fresh`
+        : `stay number one through ${monthStatus.deadlineLabel}`,
+      showingPreviousFinal ? "final score" : leadMessage.toLowerCase(),
     ].join(", ");
     leader.setAttribute("aria-label", accessibilityLabel);
   }
