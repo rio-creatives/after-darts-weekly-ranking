@@ -121,9 +121,7 @@ function render(data) {
   title.innerHTML = showingPreviousFinal
     ? `${displayMonthLabel} <span>FINAL TOP 3</span>`
     : "MONTHLY <span>COUNT-UP</span> RANKING";
-  statusLabel.textContent = showingPreviousFinal
-    ? `${currentMonthLabel} RANKING UPDATING`
-    : "LIVE UPDATE";
+  statusLabel.textContent = "LIVE UPDATE";
 
   const rankings = Array.isArray(data.rankings) ? data.rankings : [];
   const allSorted = rankings
