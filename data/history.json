@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-09-02T19:29:43+08:00",
+  "lastSuccessfulCheckAt": "2026-09-03T02:48:20+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
@@ -211,17 +211,37 @@
     "2026-09": {
       "periodStart": "2026-09-01T00:00:00+08:00",
       "periodEnd": "2026-09-30T23:59:59+08:00",
-      "updatedAt": "2026-09-02T19:29:43+08:00",
+      "updatedAt": "2026-09-03T02:48:20+08:00",
       "rankings": [
         {
           "rank": 1,
+          "player": "Rei",
+          "score": 666
+        },
+        {
+          "rank": 2,
           "player": "YUTA",
           "score": 533
         },
         {
-          "rank": 2,
+          "rank": 3,
+          "player": "AOTO",
+          "score": 486
+        },
+        {
+          "rank": 4,
+          "player": "Queen",
+          "score": 457
+        },
+        {
+          "rank": 5,
           "player": "RYO YABUSAME",
           "score": 422
+        },
+        {
+          "rank": 6,
+          "player": "ROSE",
+          "score": 317
         }
       ]
     }
