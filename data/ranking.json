@@ -2,7 +2,7 @@
   "periodType": "monthly",
   "periodStart": "2026-09-01T00:00:00+08:00",
   "periodEnd": "2026-09-30T23:59:59+08:00",
-  "updatedAt": "2026-09-04T02:47:13+08:00",
+  "updatedAt": "2026-09-04T05:26:19+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "displayMode": "current_month",
   "currentMonth": "2026-09",
@@ -20,13 +20,13 @@
     },
     {
       "rank": 3,
-      "player": "AOTO",
-      "score": 486
+      "player": "YOSHI",
+      "score": 521
     },
     {
       "rank": 4,
-      "player": "YOSHI",
-      "score": 465
+      "player": "AOTO",
+      "score": 486
     },
     {
       "rank": 5,
@@ -41,7 +41,7 @@
     {
       "rank": 7,
       "player": "ROSE",
-      "score": 317
+      "score": 349
     }
   ]
 }
