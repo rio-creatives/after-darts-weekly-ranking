@@ -1,0 +1,44 @@
+{
+  "snapshotDate": "2026-09-08",
+  "month": "2026-09",
+  "stage": "first_week",
+  "daysRemaining": 22,
+  "dataUpdatedAt": "2026-09-08T07:44:11+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "Rei",
+      "score": 666
+    },
+    {
+      "rank": 2,
+      "player": "YUTA",
+      "score": 541
+    },
+    {
+      "rank": 3,
+      "player": "YOSHI",
+      "score": 521
+    },
+    {
+      "rank": 4,
+      "player": "AOTO",
+      "score": 486
+    },
+    {
+      "rank": 5,
+      "player": "Queen",
+      "score": 457
+    },
+    {
+      "rank": 6,
+      "player": "RYO YABUSAME",
+      "score": 422
+    },
+    {
+      "rank": 7,
+      "player": "ROSE",
+      "score": 349
+    }
+  ]
+}
