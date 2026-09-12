@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-09-13T04:55:16+08:00",
+  "lastSuccessfulCheckAt": "2026-09-13T07:00:46+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
   "months": {
     "2026-07": {
@@ -211,7 +211,7 @@
     "2026-09": {
       "periodStart": "2026-09-01T00:00:00+08:00",
       "periodEnd": "2026-09-30T23:59:59+08:00",
-      "updatedAt": "2026-09-13T04:55:16+08:00",
+      "updatedAt": "2026-09-13T07:00:46+08:00",
       "rankings": [
         {
           "rank": 1,
