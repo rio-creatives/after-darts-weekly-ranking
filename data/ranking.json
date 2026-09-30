@@ -4,8 +4,8 @@
   "periodEnd": "2026-09-30T23:59:59+08:00",
   "updatedAt": "2026-09-30T23:52:53+08:00",
   "source": "https://www.dartslive.com/ph/ranking/",
-  "displayMode": "current_month",
-  "currentMonth": "2026-09",
+  "displayMode": "previous_month_final",
+  "currentMonth": "2026-10",
   "displayMonth": "2026-09",
   "rankings": [
     {
@@ -22,61 +22,6 @@
       "rank": 3,
       "player": "MARUFUJI",
       "score": 559
-    },
-    {
-      "rank": 4,
-      "player": "KEISUKE",
-      "score": 545
-    },
-    {
-      "rank": 5,
-      "player": "YUTA",
-      "score": 541
-    },
-    {
-      "rank": 6,
-      "player": "YOSHI",
-      "score": 521
-    },
-    {
-      "rank": 7,
-      "player": "Queen",
-      "score": 509
-    },
-    {
-      "rank": 8,
-      "player": "AOTO",
-      "score": 486
-    },
-    {
-      "rank": 9,
-      "player": "ROSE",
-      "score": 484
-    },
-    {
-      "rank": 10,
-      "player": "TRYO",
-      "score": 423
-    },
-    {
-      "rank": 11,
-      "player": "RYO YABUSAME",
-      "score": 422
-    },
-    {
-      "rank": 12,
-      "player": "Okayaman",
-      "score": 410
-    },
-    {
-      "rank": 13,
-      "player": "Johann",
-      "score": 410
-    },
-    {
-      "rank": 14,
-      "player": "Wakkanai!",
-      "score": 367
     }
   ]
 }
