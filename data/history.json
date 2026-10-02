@@ -6,8 +6,8 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-09-30T23:52:53+08:00",
-  "source": "https://www.dartslive.com/ph/ranking/",
+  "lastSuccessfulCheckAt": "2026-10-03T03:56:26+08:00",
+  "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
       "periodStart": "2026-07-01T00:00:00+08:00",
@@ -282,6 +282,18 @@
           "rank": 14,
           "player": "Wakkanai!",
           "score": 367
+        }
+      ]
+    },
+    "2026-10": {
+      "periodStart": "2026-10-01T00:00:00+08:00",
+      "periodEnd": "2026-10-31T23:59:59+08:00",
+      "updatedAt": "2026-10-03T03:56:26+08:00",
+      "rankings": [
+        {
+          "rank": 1,
+          "player": "ROSE",
+          "score": 393
         }
       ]
     }
