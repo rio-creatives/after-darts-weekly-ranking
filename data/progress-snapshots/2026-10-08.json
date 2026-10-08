@@ -1,0 +1,29 @@
+{
+  "snapshotDate": "2026-10-08",
+  "month": "2026-10",
+  "stage": "first_week",
+  "daysRemaining": 23,
+  "dataUpdatedAt": "2026-10-08T08:09:12+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "KEISUKE",
+      "score": 574
+    },
+    {
+      "rank": 2,
+      "player": "Queen",
+      "score": 407
+    },
+    {
+      "rank": 3,
+      "player": "MARUFUJI",
+      "score": 401
+    },
+    {
+      "rank": 4,
+      "player": "ROSE",
+      "score": 393
+    }
+  ]
+}
