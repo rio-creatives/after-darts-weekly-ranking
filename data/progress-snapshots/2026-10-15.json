@@ -1,0 +1,39 @@
+{
+  "snapshotDate": "2026-10-15",
+  "month": "2026-10",
+  "stage": "mid_month",
+  "daysRemaining": 16,
+  "dataUpdatedAt": "2026-10-15T08:58:56+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "NOMERI",
+      "score": 814
+    },
+    {
+      "rank": 2,
+      "player": "Rei",
+      "score": 611
+    },
+    {
+      "rank": 3,
+      "player": "KEISUKE",
+      "score": 574
+    },
+    {
+      "rank": 4,
+      "player": "Queen",
+      "score": 407
+    },
+    {
+      "rank": 5,
+      "player": "MARUFUJI",
+      "score": 401
+    },
+    {
+      "rank": 6,
+      "player": "ROSE",
+      "score": 393
+    }
+  ]
+}
