@@ -6,7 +6,7 @@
       "players": {}
     }
   },
-  "lastSuccessfulCheckAt": "2026-10-17T20:29:38+08:00",
+  "lastSuccessfulCheckAt": "2026-10-17T23:54:34+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
   "months": {
     "2026-07": {
@@ -288,7 +288,7 @@
     "2026-10": {
       "periodStart": "2026-10-01T00:00:00+08:00",
       "periodEnd": "2026-10-31T23:59:59+08:00",
-      "updatedAt": "2026-10-17T20:29:38+08:00",
+      "updatedAt": "2026-10-17T23:54:34+08:00",
       "rankings": [
         {
           "rank": 1,
@@ -307,16 +307,21 @@
         },
         {
           "rank": 4,
+          "player": "YUTA",
+          "score": 559
+        },
+        {
+          "rank": 5,
           "player": "Queen",
           "score": 407
         },
         {
-          "rank": 5,
+          "rank": 6,
           "player": "MARUFUJI",
           "score": 401
         },
         {
-          "rank": 6,
+          "rank": 7,
           "player": "ROSE",
           "score": 393
         }
