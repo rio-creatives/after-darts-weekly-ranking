@@ -1,0 +1,54 @@
+{
+  "snapshotDate": "2026-10-28",
+  "month": "2026-10",
+  "stage": "final_challenge",
+  "daysRemaining": 3,
+  "dataUpdatedAt": "2026-10-28T09:39:39+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "NOMERI",
+      "score": 814
+    },
+    {
+      "rank": 2,
+      "player": "Rei",
+      "score": 611
+    },
+    {
+      "rank": 3,
+      "player": "KEISUKE",
+      "score": 574
+    },
+    {
+      "rank": 4,
+      "player": "YUTA",
+      "score": 559
+    },
+    {
+      "rank": 5,
+      "player": "NO NAME 4757",
+      "score": 484
+    },
+    {
+      "rank": 6,
+      "player": "AOTO",
+      "score": 413
+    },
+    {
+      "rank": 7,
+      "player": "Queen",
+      "score": 407
+    },
+    {
+      "rank": 8,
+      "player": "MARUFUJI",
+      "score": 401
+    },
+    {
+      "rank": 9,
+      "player": "ROSE",
+      "score": 393
+    }
+  ]
+}
