@@ -4,8 +4,8 @@
   "periodEnd": "2026-10-31T23:59:59+08:00",
   "updatedAt": "2026-10-31T22:53:58+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
-  "displayMode": "current_month",
-  "currentMonth": "2026-10",
+  "displayMode": "previous_month_final",
+  "currentMonth": "2026-11",
   "displayMonth": "2026-10",
   "rankings": [
     {
@@ -22,36 +22,6 @@
       "rank": 3,
       "player": "KEISUKE",
       "score": 574
-    },
-    {
-      "rank": 4,
-      "player": "YUTA",
-      "score": 559
-    },
-    {
-      "rank": 5,
-      "player": "NO NAME 4757",
-      "score": 484
-    },
-    {
-      "rank": 6,
-      "player": "AOTO",
-      "score": 413
-    },
-    {
-      "rank": 7,
-      "player": "Queen",
-      "score": 407
-    },
-    {
-      "rank": 8,
-      "player": "MARUFUJI",
-      "score": 401
-    },
-    {
-      "rank": 9,
-      "player": "ROSE",
-      "score": 393
     }
   ]
 }
