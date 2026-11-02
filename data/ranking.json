@@ -1,27 +1,22 @@
 {
   "periodType": "monthly",
-  "periodStart": "2026-10-01T00:00:00+08:00",
-  "periodEnd": "2026-10-31T23:59:59+08:00",
-  "updatedAt": "2026-10-31T22:53:58+08:00",
+  "periodStart": "2026-11-01T00:00:00+08:00",
+  "periodEnd": "2026-11-30T23:59:59+08:00",
+  "updatedAt": "2026-11-03T04:17:48+08:00",
   "source": "https://search.dartslive.com/ph/shop/5c142ac9a5d39ea9fec1ae84bb28bd87/data",
-  "displayMode": "previous_month_final",
+  "displayMode": "current_month",
   "currentMonth": "2026-11",
-  "displayMonth": "2026-10",
+  "displayMonth": "2026-11",
   "rankings": [
     {
       "rank": 1,
-      "player": "NOMERI",
-      "score": 814
+      "player": "Johann",
+      "score": 557
     },
     {
       "rank": 2,
-      "player": "Rei",
-      "score": 611
-    },
-    {
-      "rank": 3,
-      "player": "KEISUKE",
-      "score": 574
+      "player": "Queen",
+      "score": 330
     }
   ]
 }
