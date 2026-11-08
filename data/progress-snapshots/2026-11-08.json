@@ -1,0 +1,34 @@
+{
+  "snapshotDate": "2026-11-08",
+  "month": "2026-11",
+  "stage": "first_week",
+  "daysRemaining": 22,
+  "dataUpdatedAt": "2026-11-08T09:22:26+08:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "player": "Johann",
+      "score": 557
+    },
+    {
+      "rank": 2,
+      "player": "とし☆ふぁいてぃ",
+      "score": 498
+    },
+    {
+      "rank": 3,
+      "player": "Queen",
+      "score": 465
+    },
+    {
+      "rank": 4,
+      "player": "KEISUKE",
+      "score": 428
+    },
+    {
+      "rank": 5,
+      "player": "ROSE",
+      "score": 222
+    }
+  ]
+}
